@@ -12,7 +12,7 @@ export const TypeWriter = ({ words }: { words: string[] }) => {
   })
   const { isType, isDelete, isDelay, isDone } = helper
   return (
-    <h1 className="lg:text-2xl dark:white typewriter-font ">
+    <h1 className="lg:text-2xl text-white typewriter-font ">
       {text}
       <Cursor cursorColor="white" />
     </h1>

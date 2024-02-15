@@ -3,28 +3,26 @@
 import { columns } from "./columns"
 import { DataTable } from "./data-table"
 import { userTableColumnSchemaType } from "@/types"
-import { Suspense, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import { LoaderIcon } from "@/components/LoaderIcon";
 import Icons from "@/components/Icons";
 
 async function getData(): Promise<userTableColumnSchemaType[]> {
-  const res = await fetch(`/api/user-list`, {
-    cache: "no-store"
-  });
+  const res = await fetch(`/api/user-list`);
   const data = await res.json();
   return data;
 }
-export default function UsersPage() {
+export default function UsersAnalyticsPage() {
   const [data, setData] = useState<userTableColumnSchemaType[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   useEffect(() => {
-    setLoading(true);
     getData().then((data) => {
       setData(data)
-      setLoading(false);
+      setLoading(false)
     });
   }, [])
   return (
-    <div className="container mx-auto ">
+    <div className="container">
       {
         loading ? (
           <div className="container flex items-center flex-col  justify-center space-y-2 lg:mt-40">

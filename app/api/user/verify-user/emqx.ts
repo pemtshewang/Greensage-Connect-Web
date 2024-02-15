@@ -14,7 +14,6 @@ export const createEmqxUser = async ({ username, password }: {
     })
   })
   if (res?.ok) {
-    console.log(res);
     return true;
   }
   return false;

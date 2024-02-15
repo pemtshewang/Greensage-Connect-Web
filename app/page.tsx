@@ -14,6 +14,7 @@ export default async function Home() {
   if (user) {
     redirect("/dashboard");
   }
+
   return (
     <div style={{ position: "relative", width: "100%", height: "100%" }}>
       <ParticlesComponent />
@@ -46,7 +47,7 @@ export default async function Home() {
             Get Started with GS-Connect
           </Link>
         </div>
-        <Footer />
+        <Footer className="flex space-x-2 absolute bottom-0 right-0 px-2 text-white" />
       </div>
     </div >
   )

@@ -23,6 +23,10 @@ export default function Sidebar() {
         <div className="w-full bg-black h-1"></div>
         {/* Sidebar content here */}
         <section className="space-y-3 py-5">
+          <a href="/dashboard" className="flex justify-between prose no-underline hover:underline">
+            Dashboard Analytics
+            <Icons.dashboard />
+          </a>
           <a
             href="/NewsFeed"
             className="flex justify-between prose no-underline hover:underline "

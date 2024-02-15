@@ -16,7 +16,17 @@ export async function POST(req: NextRequest) {
       controllerId,
     }
   })
-  if (controller) {
+  const user = await db.user.update({
+    where: {
+      id
+    },
+    data: {
+      greenhouseCount: {
+        increment: 1
+      }
+    }
+  })
+  if (user && controller) {
     return NextResponse.json({ message: "Controller synced sucessfully", }, {
       status: 200,
     })

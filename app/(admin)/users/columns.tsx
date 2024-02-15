@@ -14,6 +14,8 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { userTableColumnSchemaType } from "@/types"
 import { format } from "date-fns";
 import { toast } from "sonner"
+import { useState } from "react"
+import GenerateCode from "@/components/GenerateCodeScreen"
 
 const deleteUserById = async (id: string) => {
   const res = await fetch("http://localhost:3000/api/user", {
@@ -92,27 +94,41 @@ export const columns: ColumnDef<userTableColumnSchemaType>[] = [
     id: "actions",
     cell: ({ row }) => {
       const user = row.original
+      const [isOpen, setIsOpen] = useState(false);
+      const handleOpen = () => {
+        setIsOpen(prevState => !prevState)
+      }
       return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem
-              onClick={() => deleteUserById(user.id)}
-              className="flex space-x-3">
-              <span>
-                Delete User
-              </span>
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>View Details</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="h-8 w-8 p-0">
+                <span className="sr-only">Open menu</span>
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuLabel>Actions</DropdownMenuLabel>
+              <DropdownMenuItem
+                onClick={() => deleteUserById(user.id)}
+                className="flex space-x-3">
+                <span>
+                  Delete User
+                </span>
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={handleOpen}
+                className="flex space-x-3">
+                <span>
+                  Generate Code
+                </span>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem>View Details</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <GenerateCode id={row.original.id} handleOpen={handleOpen} isOpen={isOpen} />
+        </>
       )
     },
   },

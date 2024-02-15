@@ -6,64 +6,186 @@ import {
   CardHeader,
 } from "@/components/ui/card"
 import Icons from "../Icons";
+import { Skeleton } from "../ui/skeleton";
+import { format } from "date-fns";
 
 const getUsersJoinedCount = async () => {
-  const res = await fetch("");
+  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/dashboard/user/count`, {
+    method: "GET",
+    cache: "no-store"
+  });
+  const count = await res.json();
+  return count;
+}
+const getUsersRecentJoinedList = async () => {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/dashboard/users`, {
+    method: "GET",
+    cache: "no-store"
+  });
+  const list = await res.json();
+  return list;
+}
+
+const getUsersOnlineCount = async () => {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/dashboard/users/emqx-connected-users`, {
+    method: "GET",
+    cache: "no-store",
+  });
   const count = await res.json();
   return count;
 }
 
 export const UsersJoinedCard = () => {
   const [usersCount, setUsersCount] = useState<number>();
-  const [loading, setLoading] = useState<boolean>();
+  const [loading, setLoading] = useState<boolean>(true);
+  console.log(usersCount);
   useEffect(() => {
     getUsersJoinedCount().then((res) => {
       setUsersCount(res);
+      setLoading(false);
     })
-  }, [])
+  }, [usersCount])
   return (
     <Card className="w-[200px] h-24 relative">
       <CardHeader className="p-3 font-semibold">Users Joined</CardHeader>
       <CardContent className="p-12">
-        <h3 className="font-bold absolute bottom-0 right-0 text-3xl font-mono m-2">0</h3>
+        {
+          loading ? (
+            <Skeleton className="rounded-full w-[20px] h-[20px] absolute bottom-0 right-0 p-4 m-3 dark:bg-muted bg-gray-400" />
+          ) : (
+            <h3 className="font-bold absolute bottom-0 right-0 text-3xl font-mono m-2">
+              {usersCount}
+            </h3>
+          )
+        }
       </CardContent>
     </Card>
   )
 }
 
+
 export const UsersOnlineCard = () => {
-  const [usersCount, setUsersCount] = useState<number>();
-  const [loading, setLoading] = useState<boolean>();
+  const [usersOnlineCount, setUsersOnlineCount] = useState<number>();
+  const [loading, setLoading] = useState<boolean>(true);
   useEffect(() => {
-    getUsersJoinedCount().then((res) => {
-      setUsersCount(res);
+    getUsersOnlineCount().then((count) => {
+      setUsersOnlineCount(count);
+      setLoading(false);
     })
-  }, [])
+  }, [usersOnlineCount])
   return (
     <Card className="w-[200px] h-24  relative">
       <CardHeader className="p-3 font-semibold">Users Online</CardHeader>
       <CardContent className="p-3 ">
-        <h3 className="font-bold absolute bottom-0 right-0 text-3xl font-mono m-2">0</h3>
+        {
+          loading ? (
+            <Skeleton className="rounded-full w-[20px] h-[20px] absolute bottom-0 right-0 p-4 m-3 dark:bg-muted bg-gray-400" />
+          ) : (
+            <h3 className="font-bold absolute bottom-0 right-0 text-3xl font-mono m-2">{usersOnlineCount}</h3>
+          )
+        }
       </CardContent>
     </Card>
   )
 }
 
-export const RecentlyJoinedList = () => {
+const UsersRecentJoinedCardSkeleton = () => {
   return (
-    <Card className="container h-24  relative min-h-[30vh]">
+    <div className="relative flex border border-muted rounded-sm p-3 space-x-3">
+      <span className="flex flex-col justify-center">
+        <Skeleton className="w-10 h-10 rounded-full" />
+      </span>
+      <span className="flex flex-col space-y-2 justify-center">
+        <Skeleton className="h-4 w-[250px]" />
+        <Skeleton className="h-4 w-[250px]" />
+      </span>
+      <span className="flex absolute right-0 flex-col space-y-2 w-fit px-2">
+        <Skeleton className="h-4 w-[150px]" />
+        <Skeleton className="h-4 w-[150px]" />
+      </span>
+    </div>
+  )
+}
+const UserRecentJoinedCard = ({
+  name,
+  gewog,
+  dzongkhag,
+  date
+}: {
+  name: string
+  gewog: string
+  dzongkhag: string
+  date: string
+}) => {
+  return (
+    <div className=" flex border border-muted rounded-sm p-3">
+      <span className="p-3">
+        <Icons.userRound size={28} />
+      </span>
+      <span className="flex-col">
+        <h4>{name}</h4>
+        <p className="prose">{gewog},{dzongkhag}</p>
+      </span>
+      <span className="w-fit ml-auto">
+        <p className="prose">Joined on</p>
+        <p>{format(new Date(date), "EEE, do MMM yyyy hh:mm aa")}</p>
+      </span>
+    </div>
+  )
+}
+interface IUserRecentJoined {
+  username: string;
+  registeredAt: string;
+  dzongkhag: string;
+  gewog: string;
+}
+export const RecentlyJoinedList = () => {
+  const [users, setUsers] = useState<IUserRecentJoined[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  useEffect(() => {
+    getUsersRecentJoinedList().then((data) => {
+      setUsers(data);
+      setLoading(false);
+    }).catch((err) => {
+      console.error(err);
+    })
+  }, []);
+  return (
+    <Card className="container min-h-[30vh] pb-3 ">
       <CardHeader className="p-1 font-semibold">
-        <span className="flex space-x-3">
+        <span className="flex space-x-3 p-3">
           <h3>Users Recently Joined</h3>
           <Icons.usersJoined />
         </span>
       </CardHeader>
       <CardContent className="p-3">
-        <div className="container flex-col justify-center space-y-2">
-          <Icons.emptyUsers className="w-8 h-8 mx-auto" />
-          <p className="text-muted-foreground text-center">No users have registered yet! You may invite them</p>
+        <div className="flex-col justify-center space-y-2">
+          {
+            loading ? (
+              <>
+                <UsersRecentJoinedCardSkeleton />
+                <UsersRecentJoinedCardSkeleton />
+                <UsersRecentJoinedCardSkeleton />
+              </>
+            ) : users.length > 0 ? (
+              users.map((item) => (
+                <UserRecentJoinedCard
+                  date={item?.registeredAt as string}
+                  name={item?.username as string}
+                  gewog={item?.gewog as string}
+                  dzongkhag={item?.dzongkhag as string}
+                />
+              ))
+            ) : (
+              <>
+                <Icons.emptyUsers className="w-8 h-8 mx-auto" />
+                <p className="text-muted-foreground text-center">No users have registered yet! You may invite them</p>
+              </>
+            )
+          }
         </div>
       </CardContent>
     </Card>
   )
 }
+
