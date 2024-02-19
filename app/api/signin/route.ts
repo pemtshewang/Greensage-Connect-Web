@@ -11,10 +11,13 @@ export async function POST(req: Request, res: Response) {
   });
   const passwordMatch = await checkPassword(password, user?.password as string);
   if (user) {
+    console.log("User found");
     if (passwordMatch) {
       return NextResponse.json(user, { status: 200 });
     }
     return NextResponse.json(null, { status: 401 });
+  }else{
+    console.log("User not found");
   }
   return NextResponse.json(null, { status: 401 });
 }

@@ -1,30 +1,3 @@
-import { NextRequest, NextResponse } from "next/server";
-import { getUser } from "@/lib/session";
-
-export async function POST(request: NextRequest) {
-  const user = await getUser();
-  const credentials = await request.json();
-
-  if (user) {
-    const code = generateCode(credentials);
-    return NextResponse.json(code);
-  }
-  return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-}
-
-function generateCode(credentials: {
-  ap: string;
-  apPassword: string;
-  brokerUrl: string;
-  brokerPort: string;
-  brokerPassword: string;
-  brokerUsername: string;
-  controllerBrokerId: string;
-  userBrokerId: string;
-  wifiSSID: string;
-  wifiPassword: string;
-}) {
-  return `
     #include <WiFi.h>
     
     #include <WebSocketsServer.h>
@@ -546,5 +519,4 @@ function generateCode(credentials: {
         }
       }
     }
-  `;
-}
+

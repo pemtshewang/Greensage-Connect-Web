@@ -10,8 +10,8 @@ const authOptions: NextAuthOptions = {
     strategy: "jwt",
   },
   providers: [
+    
     CredentialsProvider({
-      // The name to display on the sign in form (e.g. 'Sign in with...')
       name: "Credentials",
       type: "credentials",
       credentials: {
@@ -19,7 +19,7 @@ const authOptions: NextAuthOptions = {
         password: {},
       },
       async authorize(credentials, req) {
-        const res = await fetch("http://localhost:3000/api/signin", {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/signin`, {
           method: "POST",
           body: JSON.stringify(credentials),
           headers: { "Content-Type": "application/json" },
@@ -27,7 +27,6 @@ const authOptions: NextAuthOptions = {
         const user = await res.json();
         // If no error and we have user data, return it
         if (res.ok && user) {
-          console.log("user is", user);
           return user;
         }
         // Return null if user data could not be retrieved
