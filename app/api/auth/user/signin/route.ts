@@ -18,12 +18,10 @@ export async function POST(req: Request) {
       greenhouseCount: true,
       irrigationCount: true,
       cid: true,
+      brokerId: true,
+      brokerIp: true,
       password: true,
-    },
-  });
-  const broker = await db.mqtt_user.findUnique({
-    where: {
-      username: username
+      brokerPort: true,
     },
   });
   const accessToken = await db.accessToken.findUnique({
@@ -33,24 +31,21 @@ export async function POST(req: Request) {
   });
   const isPasswordCorrect = await checkPassword(password, user?.password as string);
 
+  delete user["password"];
   if (isPasswordCorrect) {
     // Remove password from user object
     if (user) {
       const modifiedUser = {
         ...user,
-        brokerId: broker?.brokerId,
-        brokerIp: broker?.brokerIp,
-        brokerPort: broker?.brokerPort,
         accessToken: accessToken,
       }
+      console.log('user..', modifiedUser)
       const userAny = modifiedUser as any;
-
       // Add expiration date one month from the current date
       const expirationDate = new Date();
       expirationDate.setMonth(expirationDate.getMonth() + 1);
 
       userAny.expirationDate = expirationDate.toISOString();
-      console.log(userAny);
       return NextResponse.json(userAny, {
         status: 200,
       });

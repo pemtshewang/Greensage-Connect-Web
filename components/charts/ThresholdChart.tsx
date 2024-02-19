@@ -1,14 +1,20 @@
 "use client"
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ResponsiveContainer, AreaChart, Area, LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { format } from "date-fns";
+
+const formatDateTime = (isoDate: string) => {
+  const date = new Date(isoDate);
+  return format(date, 'yy/MM/dd@HH:mm'); // Format the date and time as desired
+};
 
 const ThresholdChart = ({ data }) => (
   <ResponsiveContainer width="100%" height={400}>
     <AreaChart data={data} margin={{ top: 40, right: 30, bottom: 10, left: 30 }}>
       <CartesianGrid strokeDasharray="3 3" />
-      <XAxis dataKey="name" />
+      <XAxis dataKey="recordedAt" tickFormatter={formatDateTime} />
       <YAxis />
       <Tooltip />
       <Legend />
@@ -23,7 +29,7 @@ const LineGraph = ({ data }) => (
   <ResponsiveContainer width="100%" height={400}>
     <LineChart data={data} margin={{ top: 40, right: 30, bottom: 10, left: 30 }}>
       <CartesianGrid strokeDasharray="3 3" />
-      <XAxis dataKey="name" />
+      <XAxis dataKey="recordedAt" tickFormatter={formatDateTime} />
       <YAxis />
       <Tooltip />
       <Legend />
@@ -35,9 +41,9 @@ const LineGraph = ({ data }) => (
 );
 const BarChartGraph = ({ data }) => (
   <ResponsiveContainer width="100%" height={400}>
-    <BarChart data={data} margin={{ top: 40, right: 30, bottom: 10, left: 30 }}>
+    <BarChart data={data} margin={{ top: 40, right: 30, bottom: 10, left: 30 }} barCategoryGap="10%" barSize={20}>
       <CartesianGrid strokeDasharray="3 3" />
-      <XAxis dataKey="name" />
+      <XAxis dataKey="recordedAt" tickFormatter={formatDateTime} />
       <YAxis />
       <Tooltip />
       <Legend />
@@ -48,23 +54,19 @@ const BarChartGraph = ({ data }) => (
   </ResponsiveContainer>
 );
 
-export default function GraphSelector() {
-  const [selectedGraph, setSelectedGraph] = useState('bar');
-  const [data, setData] = useState([
-    { name: '2024-02-12', soilMoisture: 30, humidity: 50, temperature: 25 },
-    { name: '2024-02-13', soilMoisture: 35, humidity: 55, temperature: 26 },
-    { name: '2024-02-14', soilMoisture: 40, humidity: 60, temperature: 27 },
-    { name: '2024-02-12', soilMoisture: 90, humidity: 50, temperature: 25 },
-    { name: '2024-02-13', soilMoisture: 35, humidity: 55, temperature: 26 },
-    { name: '2024-02-12', soilMoisture: 30, humidity: 50, temperature: 25 },
-    { name: '2024-02-13', soilMoisture: 35, humidity: 55, temperature: 26 },
-    { name: '2024-02-12', soilMoisture: 30, humidity: 50, temperature: 25 },
-    { name: '2024-02-14', soilMoisture: 40, humidity: 60, temperature: 27 },
-    { name: '2024-02-12', soilMoisture: 30, humidity: 50, temperature: 25 },
-    { name: '2024-02-13', soilMoisture: 35, humidity: 55, temperature: 26 },
-    { name: '2024-02-14', soilMoisture: 40, humidity: 60, temperature: 27 }
-  ]);
+export interface ReadingsParameterType {
+  recordedAt: string,
+  soilMoisture: number,
+  humidity: number,
+  temperature: number
+}
 
+export default function ReadingsGraph({ data }: { data: GraphType[] }) {
+  const [selectedGraph, setSelectedGraph] = useState('bar');
+  const [graphData, setGraphData] = useState<GraphType[]>([]);
+  useEffect(() => {
+    setGraphData(data);
+  }, [])
   const handleGraphChange = (chart) => {
     setSelectedGraph(chart);
   };
@@ -72,7 +74,7 @@ export default function GraphSelector() {
   return (
     <>
       <div className="graph-selector border-2 relative border-muted-foreground">
-        <h3 className='text-center font-mono font-bold p-3'> Threshold Records Readings</h3>
+        <h3 className='text-center font-mono font-bold p-3'>Environment Parameter Records Readings</h3>
         <p className="prose px-2">Visualization Graph</p>
         <form>
           <RadioGroup defaultChecked={true} defaultValue={selectedGraph} className='flex p-2' onValueChange={handleGraphChange}>

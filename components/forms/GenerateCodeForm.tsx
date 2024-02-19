@@ -37,7 +37,9 @@ const FormSchema = z.object({
   ap: z.string().min(1,),
   apPassword: z.string().min(1,),
   brokerUrl: z.string().min(1,),
-  brokerPort: z.number(),
+  brokerPort: z.string().refine((val) => !Number.isNaN(parseInt(val, 10)), {
+    message: "Expected number, received a string"
+  }),
   brokerUsername: z.string().min(1,),
   brokerPassword: z.string().min(8, { message: "The password should be min of 8 characters" }),
   controllerBrokerId: z.string().min(1,),
@@ -373,6 +375,7 @@ export default function GenerateCodeForm({ id }: { id: string }) {
                               <FormLabel>Enter the Broker Port</FormLabel>
                               <FormControl>
                                 <Input
+                                  type='number'
                                   className='max-w-sm'
                                   {...field}
                                 />

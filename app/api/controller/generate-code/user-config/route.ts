@@ -12,24 +12,13 @@ export async function POST(request: NextRequest) {
       },
       select: {
         username: true,
-        password: true
-      }
-    });
-    const mqttDetails = await db.mqtt_user.findUnique({
-      where: {
-        username: user?.username
-      },
-      select: {
+        password: true,
         brokerId: true,
         brokerIp: true,
         brokerPort: true
       }
     });
-    const reformedUser = {
-      ...user,
-      ...mqttDetails
-    }
-    return NextResponse.json(reformedUser);
+    return NextResponse.json(user);
   }
   return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
 }

@@ -2,10 +2,11 @@ import { NextResponse } from "next/server"; import { hashPassword } from "@/util
 import { db } from "@/lib/db";
 import { initiateVerification, verifyNumber } from "@/utils/verify-sms";
 import { getUser } from "@/lib/session";
+import { generateBrokerId } from "./verify-user/emqx";
 
 export async function POST(req: Request, res: Response) {
   const { username, password, cid, mobile, gewog, dzongkhag } = await req.json();
-  // trim all content to remove whitespaces
+  const brokerId = generateBrokerId(username as string, mobile as string);
   const trimmedUser = {
     username: username.trim(),
     password: password.trim(),
@@ -13,9 +14,11 @@ export async function POST(req: Request, res: Response) {
     mobile: mobile.trim(),
     gewog: gewog.trim(),
     dzongkhag: dzongkhag.trim(),
+    brokerId: brokerId,
+    brokerIp: "192.168.0.163",
+    brokerPort: 8083,
   }
   const hashedPassword = await hashPassword(password);
-  // Create user
   const user = await db.user.create({
     data: {
       ...trimmedUser,

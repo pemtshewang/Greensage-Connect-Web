@@ -26,23 +26,34 @@ function generateCode(credentials: {
 }) {
   return `
     #include <WiFi.h>
+    
     #include <WebSocketsServer.h>
+
     #include <PubSubClient.h>
+
     #include <Wire.h>
+
     #include "RTClib.h"
+
     #include <Preferences.h>
+
     #include <Adafruit_Sensor.h>
+
     #include <Adafruit_BME680.h>
+
     #include <Wire.h>
+
     #include <Adafruit_GFX.h>
+
     #include <Adafruit_SSD1306.h>
+
     #define SCREEN_WIDTH 128
     #define SCREEN_HEIGHT 64
-    #define OLED_RESET - 1
+    #define OLED_RESET -1
     #define SCREEN_ADDRESS 0x3C
     #define RELAY_ON LOW
 
-    Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, & Wire, OLED_RESET);
+    Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
     RTC_DS3231 rtc;
     WiFiClient espClient;
@@ -55,7 +66,7 @@ function generateCode(credentials: {
     const char * mqtt_server = "${credentials.brokerUrl}";
     const char * mqtt_username = "${credentials.brokerUsername}";
     const char * mqtt_password = "${credentials.brokerPassword}";
-    const int mqtt_port = "${credentials.brokerPort}";
+    const int mqtt_port = ${credentials.brokerPort};
     static String controllerBrokerId = "${credentials.controllerBrokerId}";
     static String userBrokerId = "${credentials.userBrokerId}";
     unsigned long lastMqttPublishTime = 0;
@@ -83,36 +94,33 @@ function generateCode(credentials: {
     bool leftRollerShutterManuallyOn = false;
 
     // soil moisture conversion
-    int getMoisturePercentage(int sensorValue)
-    {
+    int getMoisturePercentage(int sensorValue) {
       return map(sensorValue, dryValue, wetValue, 0, 100);
     }
 
-    void clearSlot(int slotNumber)
-    {
-        String slotKey = "slot" + String(slotNumber);
+    void clearSlot(int slotNumber) {
+      String slotKey = "slot" + String(slotNumber);
       prefs.begin(slotKey.c_str(), false);
       Serial.println("Slot " + String(slotNumber) + " cleared");
       prefs.clear();
       prefs.end();
     }
 
-    void checkSlot(int slotNumber)
-    {
-        String slotKey = "slot" + String(slotNumber);
+    void checkSlot(int slotNumber) {
+      String slotKey = "slot" + String(slotNumber);
       prefs.begin(slotKey.c_str(), false);
-        int repetitionDays = prefs.getInt("repetitionDays");
-        String startTime = prefs.getString("start");
-        String endTime = prefs.getString("end");
+      int repetitionDays = prefs.getInt("repetitionDays");
+      String startTime = prefs.getString("start");
+      String endTime = prefs.getString("end");
       prefs.end();
 
-        DateTime now = rtc.now();
-        int currentDay = now.dayOfTheWeek() + 1;
-        char currentTimeStr[9];
+      DateTime now = rtc.now();
+      int currentDay = now.dayOfTheWeek() + 1;
+      char currentTimeStr[9];
       // ignores seconds
       sprintf(currentTimeStr, "%02d:%02d", now.hour(), now.minute());
 
-        bool isCurrentDayIncluded = repetitionDays & (1 << currentDay);
+      bool isCurrentDayIncluded = repetitionDays & (1 << currentDay);
 
       if (isCurrentDayIncluded) {
         if (startTime <= String(currentTimeStr) && String(currentTimeStr) <= endTime && !isWaterValveScheduled) {
@@ -131,49 +139,47 @@ function generateCode(credentials: {
       }
     }
 
-    void storeScheduledDates(int slotNumber, String startTime, String endTime, int repetitionDays)
-    {
+    void storeScheduledDates(int slotNumber, String startTime, String endTime, int repetitionDays) {
       switch (slotNumber) {
-        case 1:
-          Serial.println("Slot 1 storing");
-          prefs.begin("slot1", false);
-          prefs.putString("start", startTime);
-          prefs.putString("end", endTime);
-          prefs.putInt("repetitionDays", repetitionDays);
-          prefs.end(); break;
-        case 2:
-          Serial.println("Slot 2 storing");
-          prefs.begin("slot2", false);
-          prefs.putString("start", startTime);
-          prefs.putString("end", endTime);
-          prefs.putInt("repetitionDays", repetitionDays);
-          prefs.end();
-          break;
-        case 3:
-          Serial.println("Slot 3 storing");
-          prefs.begin("slot3", false);
-          prefs.putString("start", startTime);
-          prefs.putString("end", endTime);
-          prefs.putInt("repetitionDays", repetitionDays);
-          prefs.end();
-          break;
+      case 1:
+        Serial.println("Slot 1 storing");
+        prefs.begin("slot1", false);
+        prefs.putString("start", startTime);
+        prefs.putString("end", endTime);
+        prefs.putInt("repetitionDays", repetitionDays);
+        prefs.end();
+        break;
+      case 2:
+        Serial.println("Slot 2 storing");
+        prefs.begin("slot2", false);
+        prefs.putString("start", startTime);
+        prefs.putString("end", endTime);
+        prefs.putInt("repetitionDays", repetitionDays);
+        prefs.end();
+        break;
+      case 3:
+        Serial.println("Slot 3 storing");
+        prefs.begin("slot3", false);
+        prefs.putString("start", startTime);
+        prefs.putString("end", endTime);
+        prefs.putInt("repetitionDays", repetitionDays);
+        prefs.end();
+        break;
       }
     }
 
     unsigned long lastReadingTime = 0;
 
     void handleDeviceControl(const String & topic,
-                             const String & message)
-    {
+      const String & message) {
+      Serial.println("The topic is: ",topic);
       if (topic == "light") {
         digitalWrite(lightPin, (message == "on") ? RELAY_ON : !RELAY_ON);
-      }
-      else if (topic == "ventilationFan") {
+      } else if (topic == "ventilationFan") {
         Serial.println("Ventilation fan is " + message);
         isFanManuallyOn = message == "on";
         digitalWrite(exFanPin, (message == "on") ? !RELAY_ON : RELAY_ON);
-      }
-      else if (topic == "waterValve") {
+      } else if (topic == "waterValve") {
         Serial.println("Water valve is " + message);
         isWaterValveManuallyOn = message == "open";
         if (message == "open") {
@@ -183,24 +189,23 @@ function generateCode(credentials: {
           digitalWrite(waterValvePin, !RELAY_ON);
           Serial.println("Water valve is closed");
         }
-      }
-      else if (topic == "schedule") {
-            int firstDelimiterPos = message.indexOf('|');
-            int secondDelimiterPos = message.indexOf('|', firstDelimiterPos + 1);
-            int thirdDelimiterPos = message.indexOf('|', secondDelimiterPos + 1);
+      } else if (topic == "schedule") {
+        int firstDelimiterPos = message.indexOf('|');
+        int secondDelimiterPos = message.indexOf('|', firstDelimiterPos + 1);
+        int thirdDelimiterPos = message.indexOf('|', secondDelimiterPos + 1);
 
-            String slotNumber = message.substring(0, firstDelimiterPos);
-            String startTime = message.substring(firstDelimiterPos + 1, secondDelimiterPos);
-            String endTime = message.substring(secondDelimiterPos + 1, thirdDelimiterPos);
-            String repetitionDaysStr = message.substring(thirdDelimiterPos + 1);
+        String slotNumber = message.substring(0, firstDelimiterPos);
+        String startTime = message.substring(firstDelimiterPos + 1, secondDelimiterPos);
+        String endTime = message.substring(secondDelimiterPos + 1, thirdDelimiterPos);
+        String repetitionDaysStr = message.substring(thirdDelimiterPos + 1);
 
-            // Extracting values for the last part (repetitionDays)
-            int lastDelimiterPos = repetitionDaysStr.indexOf('|');
+        // Extracting values for the last part (repetitionDays)
+        int lastDelimiterPos = repetitionDaysStr.indexOf('|');
         if (lastDelimiterPos != -1) {
           repetitionDaysStr = repetitionDaysStr.substring(0, lastDelimiterPos);
         }
 
-            int repetitionDays = repetitionDaysStr.toInt(); // Convert repetitionDaysStr to an integer
+        int repetitionDays = repetitionDaysStr.toInt(); // Convert repetitionDaysStr to an integer
 
         Serial.println("Slot: " + slotNumber);
         Serial.println("Start Time: " + startTime);
@@ -208,33 +213,28 @@ function generateCode(credentials: {
         Serial.println("Repetition Days: " + repetitionDays);
         // convert slotNumber to int
         storeScheduledDates(slotNumber.toInt(), startTime, endTime, repetitionDays);
-      }
-      else if (topic == "scheduleClear") {
+      } else if (topic == "scheduleClear") {
         clearSlot(message.toInt());
-      }
-      else if (topic == "rollerShutterLeft") {
+      } else if (topic == "rollerShutterLeft") {
         Serial.println("Left roller shutter is " + message);
         if (message == "up") {
           Serial.println("Left roller shutter up");
           leftRollerShutterManuallyOn = true;
           digitalWrite(leftVentilationRollerShutterPinUp, RELAY_ON);
           digitalWrite(leftVentilationRollerShutterPinDown, !RELAY_ON);
-        }
-        else if (message == "down") {
+        } else if (message == "down") {
           Serial.println("Left roller shutter down");
           leftRollerShutterManuallyOn = false;
           digitalWrite(leftVentilationRollerShutterPinUp, !RELAY_ON);
           digitalWrite(leftVentilationRollerShutterPinDown, RELAY_ON);
         }
-      }
-      else if (topic == "rollerShutterRight") {
+      } else if (topic == "rollerShutterRight") {
         if (message == "up") {
           rightRollerShutterManuallyOn = true;
           Serial.println("Right roller shutter up");
           digitalWrite(rightVentilationRollerShutterPinUp, RELAY_ON);
           digitalWrite(rightVentilationRollerShutterPinDown, !RELAY_ON);
-        }
-        else if (message == "down") {
+        } else if (message == "down") {
           rightRollerShutterManuallyOn = false;
           Serial.println("Right roller shutter down");
           digitalWrite(rightVentilationRollerShutterPinUp, !RELAY_ON);
@@ -243,69 +243,67 @@ function generateCode(credentials: {
       }
     }
 
-    void callback(char * topic, byte * payload, unsigned int length)
-    {
-        String receivedTopic = String(topic);
-        String receivedPayload;
-      for (int i = 0; i < length; i++)
-      {
-        receivedPayload += (char)payload[i];
+    int extractMainTopic(String str){
+       int firstSlashPos = str.indexOf("/"); // Find the position of the first "/"
+       if (firstSlashPos != -1) {
+         int secondSlashPos = str.indexOf("/", firstSlashPos + 1); // Find the position of the second "/"
+         return secondSlashPos;
+       }
+    }
+    
+    void callback(char * topic, byte * payload, unsigned int length) {
+      String receivedTopic = String(topic);
+      String receivedPayload;
+      for (int i = 0; i < length; i++) {
+        receivedPayload += (char) payload[i];
       }
-      Serial.println("Received topic: " + receivedTopic);
-        int lastSlashIndex = receivedTopic.lastIndexOf('/');
+      int lastSlashIndex = extractMainTopic(receivedTopic);
       // the recieved topic will be in the format of "controllerId/deviceId"
       // split and get the deviceId
-      Serial.println("Received deviceid: " + receivedTopic.substring(lastSlashIndex + 1));
       Serial.println("Received payload: " + receivedPayload);
-      handleDeviceControl(receivedTopic.substring(lastSlashIndex + 1), receivedPayload);
+      handleDeviceControl(receivedTopic.substring(lastSlashIndex+1), receivedPayload);
     }
+    
 
-    void onWebSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t length)
-    {
+    void onWebSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t length) {
       if (type == WStype_CONNECTED) {
         Serial.println("Connected to WebSocket");
-      }
-      else if (type == WStype_TEXT) {
+      } else if (type == WStype_TEXT) {
         if (length > 0) {
-                String message = (char *)payload;
+          String message = (char * ) payload;
           if (message == "ping") {
             // Respond to 'ping' with 'pong'
             webSocket.sendTXT(num, "pong");
             // if the message recieved starts from "threshold:" then update the threshold valueh
-          }
-          else if (message.startsWith("threshold:")) {
-                    // the message will be threshold:temperature:value
-                    String thresholdType = message.substring(message.indexOf(':') + 1, message.lastIndexOf(':'));
-                    float thresholdValue = message.substring(message.lastIndexOf(':') + 1).toFloat();
+          } else if (message.startsWith("threshold:")) {
+            // the message will be threshold:temperature:value
+            String thresholdType = message.substring(message.indexOf(':') + 1, message.lastIndexOf(':'));
+            float thresholdValue = message.substring(message.lastIndexOf(':') + 1).toFloat();
             prefs.begin("my-app", false);
             if (thresholdType == "temperature") {
               prefs.putFloat("temp", thresholdValue);
-            }
-            else if (thresholdType == "humidity") {
+            } else if (thresholdType == "humidity") {
               prefs.putFloat("hum", thresholdValue);
-            }
-            else if (thresholdType == "soil_moisture") {
+            } else if (thresholdType == "soil_moisture") {
               prefs.putFloat("soil", thresholdValue);
             }
             prefs.end();
-          }
-          else if (message.startsWith("scheduleClear|")) {
-                    // the message will be scheduleClear|slotNumber
-                    String slotNumber = message.substring(14); // Skip "scheduleClear|"
+          } else if (message.startsWith("scheduleClear|")) {
+            // the message will be scheduleClear|slotNumber
+            String slotNumber = message.substring(14); // Skip "scheduleClear|"
             clearSlot(slotNumber.toInt());
-          }
-          else if (message.startsWith("schedule|")) {
-                    String scheduleInfo = message.substring(9); // Skip "schedule|"
-                    int firstDelimiterPos = scheduleInfo.indexOf('|');
-                    int secondDelimiterPos = scheduleInfo.indexOf('|', firstDelimiterPos + 1);
-                    int thirdDelimiterPos = scheduleInfo.indexOf('|', secondDelimiterPos + 1);
+          } else if (message.startsWith("schedule|")) {
+            String scheduleInfo = message.substring(9); // Skip "schedule|"
+            int firstDelimiterPos = scheduleInfo.indexOf('|');
+            int secondDelimiterPos = scheduleInfo.indexOf('|', firstDelimiterPos + 1);
+            int thirdDelimiterPos = scheduleInfo.indexOf('|', secondDelimiterPos + 1);
 
-                    String slotNumber = scheduleInfo.substring(0, firstDelimiterPos);
-                    String startTime = scheduleInfo.substring(firstDelimiterPos + 1, secondDelimiterPos);
-                    String endTime = scheduleInfo.substring(secondDelimiterPos + 1, thirdDelimiterPos);
-                    String repetitionDaysStr = scheduleInfo.substring(thirdDelimiterPos + 1);
+            String slotNumber = scheduleInfo.substring(0, firstDelimiterPos);
+            String startTime = scheduleInfo.substring(firstDelimiterPos + 1, secondDelimiterPos);
+            String endTime = scheduleInfo.substring(secondDelimiterPos + 1, thirdDelimiterPos);
+            String repetitionDaysStr = scheduleInfo.substring(thirdDelimiterPos + 1);
 
-                    int repetitionDays = repetitionDaysStr.toInt(); // Convert repetitionDaysStr to an integer
+            int repetitionDays = repetitionDaysStr.toInt(); // Convert repetitionDaysStr to an integer
 
             Serial.println("Slot: " + slotNumber);
             Serial.println("Start Time: " + startTime);
@@ -313,23 +311,21 @@ function generateCode(credentials: {
             Serial.println("Repetition Days: " + repetitionDays);
             // convert slotNumber to int
             storeScheduledDates(slotNumber.toInt(), startTime, endTime, repetitionDays);
-          }
-          else {
-                    String device = message.substring(0, message.indexOf(':'));
-                    String action = message.substring(message.indexOf(':') + 1);
-                    String topic = device;
+          } else {
+            String device = message.substring(0, message.indexOf(':'));
+            String action = message.substring(message.indexOf(':') + 1);
+            String topic = device;
             handleDeviceControl(topic, action);
           }
         }
       }
     }
 
-    void reconnect()
-    {
+    void reconnect() {
       // Loop until we’re reconnected
       while (!client.connected()) {
         Serial.print("Attempting MQTT connection… ");
-            String clientId = "ESP32Client";
+        String clientId = "ESP32Client";
         // Attempt to connect
         if (client.connect(clientId.c_str(), mqtt_username, mqtt_password)) {
           display.println();
@@ -337,9 +333,8 @@ function generateCode(credentials: {
           display.display();
           Serial.println("connected!");
           // subscribe to every topic
-          client.subscribe((userBrokerId + "/#").c_str());
-        }
-        else {
+          client.subscribe(("user/"+userBrokerId+"/#").c_str());
+        } else {
           Serial.print("failed, rc = ");
           Serial.print(client.state());
           Serial.println(" try again in 5 seconds");
@@ -349,8 +344,7 @@ function generateCode(credentials: {
       }
     }
 
-    void setup()
-    {
+    void setup() {
       Serial.begin(115200);
       pinMode(lightPin, OUTPUT);
       pinMode(exFanPin, OUTPUT);
@@ -370,18 +364,35 @@ function generateCode(credentials: {
 
       if (!display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS)) {
         Serial.println(F("SSD1306 allocation failed"));
-        for (; ;);
+        for (;;);
       }
       display.display(); // Initialize with an empty display
 
-      delay(2000);  // Pause for 2 seconds
+      delay(2000); // Pause for 2 seconds
       display.clearDisplay();
       if (!rtc.begin()) {
         Serial.println("Could not find RTC! Check circuit.");
-        rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
         while (1)
-          ;
+        ;
       }
+      rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
+      DateTime now = rtc.now();
+
+      // Print the date and time to the serial monitor
+      Serial.print("Current date and time: ");
+      Serial.print(now.year(), DEC);
+      Serial.print('/');
+      Serial.print(now.month(), DEC);
+      Serial.print('/');
+      Serial.print(now.day(), DEC);
+      Serial.print(" ");
+      Serial.print(now.hour(), DEC);
+      Serial.print(':');
+      Serial.print(now.minute(), DEC);
+      Serial.print(':');
+      Serial.print(now.second(), DEC);
+      Serial.println();
+      
       if (rtc.lostPower()) {
         Serial.println("RTC lost power, lets set the time!");
         // following line sets the RTC to the date & time this sketch was compiled
@@ -392,7 +403,7 @@ function generateCode(credentials: {
         while (1);
       }
       prefs.begin("my-app", false);
-        static float defaultThreshold = 25.0;
+      static float defaultThreshold = 25.0;
       prefs.putFloat("temp", defaultThreshold);
       randomSeed(micros());
       WiFi.mode(WIFI_STA);
@@ -412,7 +423,6 @@ function generateCode(credentials: {
       display.print(WiFi.softAPIP());
       display.display();
 
-
       webSocket.begin();
       webSocket.onEvent(onWebSocketEvent);
       // only for mqtts
@@ -425,26 +435,24 @@ function generateCode(credentials: {
       delay(500);
     }
 
-    void loop()
-    {
+    void loop() {
       if (!client.connected())
         reconnect();
       client.loop();
       webSocket.loop();
       prefs.begin("my-app", false);
-        float tempThreshold = prefs.getFloat("temp");
-        float humThreshold = prefs.getFloat("hum");
+      float tempThreshold = prefs.getFloat("temp");
+      float humThreshold = prefs.getFloat("hum");
       prefs.end();
 
-      for (int i = 1; i <= 3; i++)
-      {
+      for (int i = 1; i <= 3; i++) {
         checkSlot(i);
         // You can add delays or other handling if needed between checking slots
         delay(100); // Example delay between slot checks
       }
 
-        float temperature = bme.readTemperature();
-        float humidity = bme.readHumidity();
+      float temperature = bme.readTemperature();
+      float humidity = bme.readHumidity();
       Serial.println(temperature);
       Serial.println(humidity);
 
@@ -479,34 +487,34 @@ function generateCode(credentials: {
         }
       }
 
-        unsigned long currentTime = millis();
+      unsigned long currentTime = millis();
       if (currentTime - lastReadingTime >= 0.5 * 60 * 1000 && webSocket.connectedClients() > 0) {
-            // the readings are sent after 30secs from the current elapsed time
-            int soilMoisture = getMoisturePercentage(analogRead(soilMoisturePin));
+        // the readings are sent after 30secs from the current elapsed time
+        int soilMoisture = getMoisturePercentage(analogRead(soilMoisturePin));
         if (!isnan(temperature) && !isnan(humidity && !isnan(soilMoisture))) {
           webSocket.broadcastTXT("temperature:" + String(temperature));
           webSocket.broadcastTXT("humidity:" + String(humidity));
           webSocket.broadcastTXT("soilMoisture:" + String(soilMoisture));
-        }
-        else {
+        } else {
           Serial.println("Failed to read from BME sensor!");
         }
         lastReadingTime = currentTime;
       }
 
       if (currentTime - lastMqttPublishTime >= 60 * 1000) {
-            int soilMoisture = getMoisturePercentage(analogRead(soilMoisturePin));
+        int soilMoisture = getMoisturePercentage(analogRead(soilMoisturePin));
         if (!isnan(temperature) && !isnan(humidity) && !isnan(soilMoisture)) {
-                String mqttMessage = "temperature:" + String(temperature) +
+          String mqttMessage = "temperature:" + String(temperature) +
             "|humidity:" + String(humidity) +
             "|soilMoisture:" + String(soilMoisture);
-          client.publish((userBrokerId + "/" + controllerBrokerId + "/readings").c_str(), mqttMessage.c_str());
+          client.publish(("user/"+userBrokerId+ "/" + controllerBrokerId + "/readings").c_str(), mqttMessage.c_str());
           lastMqttPublishTime = currentTime;
-        }
-        else {
+        } else {
           Serial.println("Failed to read from BME sensor!");
         }
       }
     }
-    `
+
+  `
 }
+

@@ -1,18 +1,69 @@
 "use client"
 
-import SensorChart from "@/components/charts/EnvtParameters"
-import GraphSelector from "@/components/charts/ThresholdChart"
-import WaterChartGraph from "@/components/charts/WaterSchedule"
+import ReadingsGraph, { ReadingsParameterType } from "@/components/charts/ThresholdChart"
+import { ThresholdRecordsType } from "@/components/charts/EnvtParameters"
 import { useSearchParams } from "next/navigation"
 import Icons from "@/components/Icons"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { format } from "date-fns";
+import ThresholdRecordGraph from "@/components/charts/EnvtParameters"
+import WaterChartGraph, { waterScheduleInterface } from "@/components/charts/WaterSchedule"
 
+const getUserAnalyticsData = async ({ id }: { id: string }) => {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/dashboard/user/analytics?id=${id}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json"
+    }
+  });
+  const data = await res.json();
+  return data;
+}
+
+interface AnalyticsType {
+  Reading: ReadingsParameterType[]
+  TemperatureThresholdRecord: {
+    recordedAt: string,
+    value: number
+  }[],
+  SoilMoistureThresholdRecord: {
+    recordedAt: string,
+    value: number,
+  }[],
+  WaterScheduleRecord: {
+    startTime: string,
+    endTime: string,
+    repetitionDays: number,
+  }[],
+  HumidityThresholdRecord: {
+    value: number,
+    recordedAt: string
+  }[],
+}
 const UserAnalyticPage = () => {
   const searchParams = useSearchParams();
-  const [generating, setGenerating] = useState();
+  const [generating, setGenerating] = useState<boolean>(true);
+  const [data, setUserData] = useState<AnalyticsType>();
+  const [thresholdData, setThresholdData] = useState<ThresholdRecordsType>();
+  const [wsData, setWSData] = useState<waterScheduleInterface[]>([]);
   const id = searchParams.get("id");
-  console.log(id);
+  useEffect(() => {
+    getUserAnalyticsData({ id: id as string }).then((res) => {
+      setUserData(res);
+    });
+  }, []);
+
+  useEffect(() => {
+    if (data) {
+      setThresholdData({
+        TemperatureThresholdRecord: data.TemperatureThresholdRecord,
+        HumidityThresholdRecord: data.HumidityThresholdRecord,
+        SoilMoistureThresholdRecord: data.SoilMoistureThresholdRecord
+      });
+      setWSData(data.WaterScheduleRecord);
+      setGenerating(false); // Move setGenerating inside the callback to ensure it runs after setting userData
+    }
+  }, [data]);
   return (
     <>
       {
@@ -23,7 +74,7 @@ const UserAnalyticPage = () => {
           </div >
         ) : (
           <div className="container space-y-4 lg:p-8">
-            <h3 className="font-semibold">Analytics Generated for User Pem</h3>
+            <h3 className="font-semibold">Analytics Generated for the target user</h3>
             <div className="flex justify-between">
               <span className="prose">
                 The analytics is based on the {format(new Date(), "EEEE do MMMM hh:mm aa")}
@@ -35,11 +86,10 @@ const UserAnalyticPage = () => {
                 </p>
               </span>
             </div>
-            <GraphSelector />
-            <SensorChart />
-            <WaterChartGraph />
+            <ReadingsGraph data={data?.Reading as ReadingsParameterType[]} />
+            <ThresholdRecordGraph data={thresholdData as ThresholdRecordsType} />
+            <WaterChartGraph waterScheduleRecords={wsData} />
           </div>
-
         )
       }
     </>

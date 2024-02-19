@@ -8,6 +8,7 @@ export async function POST(req: NextRequest) {
     name,
     type,
   } = await req.json();
+  console.log("type is", type)
   const controller = await db.controller.create({
     data: {
       type: type === "irrigation" ? "Irrigation" : "Greenhouse",
@@ -16,17 +17,30 @@ export async function POST(req: NextRequest) {
       controllerId,
     }
   })
-  const user = await db.user.update({
-    where: {
-      id
-    },
-    data: {
-      greenhouseCount: {
-        increment: 1
+  if (type === "greenhouse") {
+    await db.user.update({
+      where: {
+        id
+      },
+      data: {
+        greenhouseCount: {
+          increment: 1
+        }
       }
-    }
-  })
-  if (user && controller) {
+    })
+  } else {
+    await db.user.update({
+      where: {
+        id
+      },
+      data: {
+        irrigationCount: {
+          increment: 1
+        }
+      }
+    })
+  }
+  if (controller) {
     return NextResponse.json({ message: "Controller synced sucessfully", }, {
       status: 200,
     })

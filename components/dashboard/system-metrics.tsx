@@ -5,7 +5,7 @@ import Icons from "../Icons";
 
 
 const SystemMetricsPage = () => {
-  const [url, setUrl] = useState<string>("http://miniserver.local:3000/public-dashboards/1fc3ac8b8f894bbab4c2e03aa44b4cbf");
+  const [url, setUrl] = useState<string>(process.env.NEXT_PUBLIC_GRAPHANA_DASHBOARD_URL as string);
   const [graphLoading, setGraphLoading] = useState(true); // State for your custom loading state
   const [iframeLoaded, setIframeLoaded] = useState(false); // State to track iframe loading
 

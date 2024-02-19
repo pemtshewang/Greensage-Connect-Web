@@ -2,8 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import * as crypto from "crypto";
 import { db } from "@/lib/db";
 import { verifyCode } from "@/utils/verify-sms";
-import { createEmqxUser } from "./emqx";
-import { generateBrokerId } from "./emqx";
 
 export async function PATCH(req: NextRequest, res: Response) {
   const { id, code, phoneNumber } = await req.json();
@@ -32,32 +30,7 @@ export async function PATCH(req: NextRequest, res: Response) {
         id: id as string,
       },
     });
-    //create emqx username and password
-    const emqxUserCreated = await createEmqxUser({
-      username: user?.username as string,
-      password: user?.password as string,
-    })
-    if (emqxUserCreated) {
-      const brokerId = generateBrokerId(user?.username as string, user?.mobile as string);
-      const createdBroker = await db.mqtt_user.create({
-        data: {
-          username: user?.username as string,
-          password: user?.password as string,
-          brokerId: brokerId,
-          brokerIp: "10.42.0.1",
-          brokerPort: 8083,
-        }
-      })
-      console.log("broker created", createdBroker)
-      if (createdBroker) {
-        return NextResponse.json(
-          {
-            message: "User verified successfully, You may now login",
-          },
-          { status: 201 }
-        );
-      }
-    }
+    console.log("User is", user);
     return NextResponse.json(
       {
         message: "There was an error while creating the user in the MQTT broker",
@@ -72,7 +45,7 @@ export async function PATCH(req: NextRequest, res: Response) {
     { status: 500 }
   );
 }
-// Example function to generate a secure access token
+
 function generateAccessToken() {
   return crypto.randomUUID()
 }

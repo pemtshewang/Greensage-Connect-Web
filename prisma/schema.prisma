@@ -20,29 +20,28 @@ model Admin {
   isSuper            Boolean
 }
 
-model mqtt_user {
-  id         String @id @default(auto()) @map("_id") @db.ObjectId
-  username   String @unique
-  password   String
-  brokerId   String @unique
-  brokerPort Int
-  brokerIp   String
-}
-
 model User {
-  id              String        @id @default(auto()) @map("_id") @db.ObjectId
-  username        String        @unique
-  password        String
-  cid             String        @unique
-  mobile          String        @unique
-  gewog           String
-  dzongkhag       String
-  registeredAt    DateTime      @default(now())
-  verifiedAt      DateTime?
-  controllers     Controller[]
-  accessToken     AccessToken[]
-  greenhouseCount Int           @default(0)
-  irrigationCount Int           @default(0)
+  id                          String                        @id @default(auto()) @map("_id") @db.ObjectId
+  username                    String                        @unique
+  password                    String
+  cid                         String                        @unique
+  mobile                      String                        @unique
+  gewog                       String
+  dzongkhag                   String
+  registeredAt                DateTime                      @default(now())
+  verifiedAt                  DateTime?
+  controllers                 Controller[]
+  accessToken                 AccessToken[]
+  greenhouseCount             Int                           @default(0)
+  irrigationCount             Int                           @default(0)
+  brokerId                    String                        @unique
+  brokerPort                  Int
+  brokerIp                    String
+  Reading                     Reading[]
+  WaterScheduleRecord         WaterScheduleRecord[]
+  SoilMoistureThresholdRecord SoilMoistureThresholdRecord[]
+  TemperatureThresholdRecord  TemperatureThresholdRecord[]
+  HumidityThresholdRecord     HumidityThresholdRecord[]
 }
 
 enum Type {
@@ -51,15 +50,17 @@ enum Type {
 }
 
 model Controller {
-  id                   String                @id @default(auto()) @map("_id") @db.ObjectId
-  controllerId         String                @unique
-  type                 Type
-  name                 String
-  user                 User                  @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  userId               String                @db.ObjectId
-  readings             Reading[]
-  waterScheduleRecords WaterScheduleRecord[]
-  thresholdRecords     ThresholdRecord[]
+  id                           String                        @id @default(auto()) @map("_id") @db.ObjectId
+  controllerId                 String                        @unique
+  type                         Type
+  name                         String
+  user                         User                          @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId                       String                        @db.ObjectId
+  readings                     Reading[]
+  waterScheduleRecords         WaterScheduleRecord[]
+  soilMoistureThresholdRecords SoilMoistureThresholdRecord[]
+  HumidityThresholdRecord      HumidityThresholdRecord[]
+  TemperatureThresholdRecord   TemperatureThresholdRecord[]
 }
 
 model Reading {
@@ -69,26 +70,51 @@ model Reading {
   soilMoisture Float?
   recordedAt   DateTime   @default(now())
   Pressure     Float?
-  controller   Controller @relation(fields: [controllerId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  controllerId String     @db.ObjectId
+  controller   Controller @relation(fields: [controllerId], references: [controllerId], onDelete: Cascade, onUpdate: Cascade)
+  controllerId String
+  User         User       @relation(fields: [brokerId], references: [brokerId], onDelete: Cascade, onUpdate: Cascade)
+  brokerId     String
 }
 
 model WaterScheduleRecord {
-  id           String     @id @default(auto()) @map("_id") @db.ObjectId
-  startTime    DateTime
-  endTime      DateTime
-  controller   Controller @relation(fields: [controllerId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  controllerId String     @db.ObjectId
+  id             String     @id @default(auto()) @map("_id") @db.ObjectId
+  startTime      String
+  endTime        String
+  repetitionDays Int
+  controller     Controller @relation(fields: [controllerId], references: [controllerId], onDelete: Cascade, onUpdate: Cascade)
+  controllerId   String
+  User           User       @relation(fields: [brokerId], references: [brokerId], onDelete: Cascade, onUpdate: Cascade)
+  brokerId       String
 }
 
-model ThresholdRecord {
+model SoilMoistureThresholdRecord {
   id           String     @id @default(auto()) @map("_id") @db.ObjectId
   recordedAt   DateTime   @default(now())
-  soilMoisture Float?
-  humidity     Float?
-  temperature  Float?
-  controller   Controller @relation(fields: [controllerId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  controllerId String     @db.ObjectId
+  value        Float
+  controller   Controller @relation(fields: [controllerId], references: [controllerId], onDelete: Cascade, onUpdate: Cascade)
+  controllerId String
+  User         User       @relation(fields: [brokerId], references: [brokerId], onDelete: Cascade, onUpdate: Cascade)
+  brokerId     String
+}
+
+model HumidityThresholdRecord {
+  id           String     @id @default(auto()) @map("_id") @db.ObjectId
+  recordedAt   DateTime   @default(now())
+  value        Float
+  controller   Controller @relation(fields: [controllerId], references: [controllerId], onDelete: Cascade, onUpdate: Cascade)
+  controllerId String
+  User         User       @relation(fields: [brokerId], references: [brokerId], onDelete: Cascade, onUpdate: Cascade)
+  brokerId     String
+}
+
+model TemperatureThresholdRecord {
+  id           String     @id @default(auto()) @map("_id") @db.ObjectId
+  recordedAt   DateTime   @default(now())
+  value        Float
+  controller   Controller @relation(fields: [controllerId], references: [controllerId], onDelete: Cascade, onUpdate: Cascade)
+  controllerId String
+  User         User       @relation(fields: [brokerId], references: [brokerId], onDelete: Cascade, onUpdate: Cascade)
+  brokerId     String
 }
 
 model NewsFeeds {
