@@ -8,18 +8,17 @@ export async function POST(request: NextRequest) {
   if (userAuth) {
     const user = await db.user.findUnique({
       where: {
-        id: userId
+        id: userId,
       },
       select: {
         username: true,
         password: true,
         brokerId: true,
         brokerIp: true,
-        brokerPort: true
-      }
+        brokerPort: true,
+      },
     });
     return NextResponse.json(user);
   }
-  return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
+  return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
 }
-
