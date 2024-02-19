@@ -7,16 +7,38 @@ import { format } from "date-fns";
 
 const formatDateTime = (isoDate: string) => {
   const date = new Date(isoDate);
-  return format(date, 'yy/MM/dd@HH:mm'); // Format the date and time as desired
+  return format(date, 'yy/MM/dd'); // Format the date and time as desired
 };
+
+const CustomToolTip = ({active, payload, label}) =>{
+  if(active && payload && payload.length){
+    return(
+     <div className="custom-tooltip border border-muted-foreground bg-muted p-2">
+        <div className="label flex flex-col">
+          <span className="p-1 font-bold ">
+          {`Recorded at ${format(label,"EEEE do hh:mm aa",)}`}
+          </span>
+          <span className="text-[#69b3a2]">
+          {`soilMoisture : ${payload[0].value}`}
+          </span>
+          <span className="text-[#a367e7]">
+          {`Humidity : ${payload[1].value}`}
+          </span>
+          <span className="text-[#ff7f0e]">
+          {`Temperature : ${payload[2].value}`}
+          </span>
+        </div>
+      </div>
+    )
+  }
+}
 
 const ThresholdChart = ({ data }) => (
   <ResponsiveContainer width="100%" height={400}>
     <AreaChart data={data} margin={{ top: 40, right: 30, bottom: 10, left: 30 }}>
       <CartesianGrid strokeDasharray="3 3" />
-      <XAxis dataKey="recordedAt" tickFormatter={formatDateTime} />
       <YAxis />
-      <Tooltip />
+      <Tooltip content={<CustomToolTip />} />
       <Legend />
       <Area type="monotone" dataKey="soilMoisture" stackId="1" stroke="#69b3a2" fill="#69b3a2" />
       <Area type="monotone" dataKey="humidity" stackId="1" stroke="#a367e7" fill="#a367e7" />
@@ -29,9 +51,8 @@ const LineGraph = ({ data }) => (
   <ResponsiveContainer width="100%" height={400}>
     <LineChart data={data} margin={{ top: 40, right: 30, bottom: 10, left: 30 }}>
       <CartesianGrid strokeDasharray="3 3" />
-      <XAxis dataKey="recordedAt" tickFormatter={formatDateTime} />
       <YAxis />
-      <Tooltip />
+      <Tooltip content={<CustomToolTip />}/>
       <Legend />
       <Line type="monotone" dataKey="soilMoisture" stroke="#69b3a2" />
       <Line type="monotone" dataKey="humidity" stroke="#a367e7" />
@@ -39,13 +60,13 @@ const LineGraph = ({ data }) => (
     </LineChart>
   </ResponsiveContainer>
 );
+
 const BarChartGraph = ({ data }) => (
   <ResponsiveContainer width="100%" height={400}>
     <BarChart data={data} margin={{ top: 40, right: 30, bottom: 10, left: 30 }} barCategoryGap="10%" barSize={20}>
       <CartesianGrid strokeDasharray="3 3" />
-      <XAxis dataKey="recordedAt" tickFormatter={formatDateTime} />
       <YAxis />
-      <Tooltip />
+      <Tooltip content={<CustomToolTip />}/>
       <Legend />
       <Bar dataKey="soilMoisture" name="Soil Moisture" fill="#69b3a2" />
       <Bar dataKey="humidity" name="Humidity" fill="#a367e7" />

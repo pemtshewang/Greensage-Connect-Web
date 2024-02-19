@@ -12,7 +12,6 @@ export async function POST(request: NextRequest) {
       },
       select: {
         username: true,
-        password: true,
         brokerId: true,
         brokerIp: true,
         brokerPort: true,
