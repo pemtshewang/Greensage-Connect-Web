@@ -83,7 +83,7 @@ export interface ReadingsParameterType {
 }
 
 export default function ReadingsGraph({ data }: { data: GraphType[] }) {
-  const [selectedGraph, setSelectedGraph] = useState('bar');
+  const [selectedGraph, setSelectedGraph] = useState('line');
   const [graphData, setGraphData] = useState<GraphType[]>([]);
   useEffect(() => {
     setGraphData(data);

@@ -22,7 +22,6 @@ const formatDateTime = (isoDate: string) => {
 const CustomTooltip = ({ active, payload }: any) => {
   if (active && payload && payload.length) {
     const data = payload[0].payload;
-    console.log(payload);
     return (
       <div className="custom-tooltip">
         <p>{`Time: ${formatDateTime(data.recordedAt)}`}</p>
@@ -65,7 +64,7 @@ const ThresholdRecordGraph = ({ data }: {
         >
           <CartesianGrid />
           <YAxis type="number" dataKey="value" />
-          <XAxis tickFormatter={formatDateTime} type="category" dataKey="recordedAt" />
+          <XAxis tick={null}/> 
           <ZAxis dataKey={'value'} range={[60, 100]} name='z' />
           <Tooltip cursor={{ strokeDasharray: '3 3' }} content={<CustomTooltip />} />
           <Legend />
