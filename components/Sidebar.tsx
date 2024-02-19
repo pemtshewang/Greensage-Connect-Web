@@ -12,7 +12,7 @@ export default function Sidebar() {
           <Icons.drawer />
         </Button>
       </SheetTrigger>
-      <SheetContent side="left" className="w-[400px] sm:w-[540px] dark:bg-gray-300">
+      <SheetContent side="left" className="sm:w-[350px] max-w-sm dark:bg-gray-300">
         <div className="flex py-5">
           <Avatar>
             <AvatarImage src="https://source.boringavatars.com/beam/50/" alt="@logo" />
@@ -37,10 +37,6 @@ export default function Sidebar() {
           <a href="/users" className="flex justify-between prose no-underline hover:underline">
             Manage Users
             <Icons.usersGroup />
-          </a>
-          <a href="settings" className="flex justify-between prose no-underline hover:underline">
-            Settings
-            <Icons.settings />
           </a>
           <div className="divider"></div>
           <a

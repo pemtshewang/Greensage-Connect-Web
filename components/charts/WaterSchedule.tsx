@@ -12,13 +12,14 @@ export interface waterScheduleInterface {
 const WaterChartGraph = ({ waterScheduleRecords }: {
   waterScheduleRecords: waterScheduleInterface[]
 }) => {
+  console.log(waterScheduleRecords);
   const chartRef = useRef(null);
   const tooltipRef = useRef(null);
 
   const decodeRepetitionDays = (repetitionDays: number) => {
     const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
     const decodedDays = [];
-    for (let i = 0; i < 7; i++) {
+    for (let i = 1; i <= 7; i++) {
       if ((repetitionDays & (1 << i)) !== 0) {
         decodedDays.push(daysOfWeek[i]);
       }
@@ -42,7 +43,7 @@ const WaterChartGraph = ({ waterScheduleRecords }: {
       .append("g")
       .attr("transform", `translate(${margin.left}, ${margin.top})`);
 
-    const parseTime = d3.timeParse("%H:%M:%S");
+    const parseTime = d3.timeParse("%H:%M");
 
     const x = d3
       .scaleTime()
@@ -66,7 +67,6 @@ const WaterChartGraph = ({ waterScheduleRecords }: {
       .attr("class", "bar")
       .attr("x", (d) => x(parseTime(d.startTime)))
       .attr("width", (d) => x(parseTime(d.endTime)) - x(parseTime(d.startTime)))
-      .attr("y", (d, i) => y(i))
       .attr("height", y.bandwidth()) // Set height based on bandwidth
       .style("fill", "#6FA8DC")
       .on("mouseover", (event, d) => {
@@ -91,7 +91,6 @@ const WaterChartGraph = ({ waterScheduleRecords }: {
     svg.append("g").attr("transform", `translate(0, ${height})`).call(d3.axisBottom(x));
     svg.append("g").call(d3.axisLeft().scale(y).tickFormat(() => ""));
   }, []);
-
   return (
     <div className="relative border-2 border-muted-foreground p-5 overflow-hidden">
       <div
@@ -100,11 +99,10 @@ const WaterChartGraph = ({ waterScheduleRecords }: {
         style={{ display: "none" }}
       ></div>
       <div className="flex absolute justify-center container">
-        <h3 className="font-mono">Water Schedule Records</h3>
+        <h3 className="font-mono font-bold">Water Schedule Records</h3>
       </div>
-      <div ref={chartRef}></div>
-    </div>
-  );
+      <div className="p-4" ref={chartRef}></div> 
+    </div>);
 };
 
 export default WaterChartGraph;
