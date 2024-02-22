@@ -1,15 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
 import * as crypto from "crypto";
 import { db } from "@/lib/db";
-import { verifyCode } from "@/utils/verify-sms";
 
-export async function PATCH(req: NextRequest, res: Response) {
-  const { id, code, phoneNumber } = await req.json();
-  console.log(id, code, phoneNumber)
+export async function PATCH(req: NextRequest) {
+  const { id, code } = await req.json();
   const expirationDate = new Date();
   expirationDate.setMonth(expirationDate.getMonth() + 1);
-  const isVerified = await verifyCode(phoneNumber, code);
-  if (isVerified) {
+  const otp = await db.user.findUnique({
+    where: {
+      id: id
+    },
+    select: {
+      otp: true,
+      otpExpiresAt: true
+    }
+  });
+  const verified = (otp?.otp === code && otp?.otpExpiresAt as Date >= new Date());
+  if (verified) {
     await db.user.update({
       where: {
         id: id as string,
@@ -25,18 +32,11 @@ export async function PATCH(req: NextRequest, res: Response) {
         expiresAt: expirationDate.toISOString(), // Set the expiration timestamp
       },
     });
-    const user = await db.user.findUnique({
-      where: {
-        id: id as string,
-      },
+    return NextResponse.json({
+      message: "Account Verification Successful"
+    }, {
+      status: 200
     });
-    console.log("User is", user);
-    return NextResponse.json(
-      {
-        message: "There was an error while creating the user in the MQTT broker",
-      },
-      { status: 500 }
-    );
   }
   return NextResponse.json(
     {

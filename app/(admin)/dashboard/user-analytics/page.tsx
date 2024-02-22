@@ -4,27 +4,16 @@ import ReadingsGraph, { ReadingsParameterType } from "@/components/charts/Thresh
 import { ThresholdRecordsType } from "@/components/charts/EnvtParameters"
 import { useSearchParams } from "next/navigation"
 import Icons from "@/components/Icons"
-import { useEffect, useState } from "react"
+import { Suspense, useEffect, useState } from "react"
 import { format } from "date-fns";
 import ThresholdRecordGraph from "@/components/charts/EnvtParameters"
 import WaterChartGraph, { waterScheduleInterface } from "@/components/charts/WaterSchedule"
-
-const getUserAnalyticsData = async ({ id }: { id: string }) => {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/dashboard/user/analytics?id=${id}`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json"
-    }
-  });
-  const data = await res.json();
-  return data;
-}
+import { getUserAnalyticsData } from "@/app/actions"
 
 interface AnalyticsType {
   Reading: ReadingsParameterType[]
   TemperatureThresholdRecord: {
-    recordedAt: string,
-    value: number
+    recordedAt: string, value: number
   }[],
   SoilMoistureThresholdRecord: {
     recordedAt: string,
@@ -44,7 +33,11 @@ const UserAnalyticPage = () => {
   const searchParams = useSearchParams();
   const [generating, setGenerating] = useState<boolean>(true);
   const [data, setUserData] = useState<AnalyticsType>();
-  const [thresholdData, setThresholdData] = useState<ThresholdRecordsType>();
+  const [thresholdData, setThresholdData] = useState<ThresholdRecordsType>({
+    SoilMoistureThresholdRecord: [],
+    TemperatureThresholdRecord: [],
+    HumidityThresholdRecord: []
+  });
   const [wsData, setWSData] = useState<waterScheduleInterface[]>([]);
   const id = searchParams.get("id");
   useEffect(() => {
@@ -88,7 +81,12 @@ const UserAnalyticPage = () => {
             </div>
             <ReadingsGraph data={data?.Reading as ReadingsParameterType[]} />
             <ThresholdRecordGraph data={thresholdData as ThresholdRecordsType} />
-            <WaterChartGraph waterScheduleRecords={wsData} />
+            <Suspense fallback={<div>loading...</div>}>
+              {
+                wsData &&
+                <WaterChartGraph waterScheduleRecords={wsData} />
+              }
+            </Suspense>
           </div>
         )
       }

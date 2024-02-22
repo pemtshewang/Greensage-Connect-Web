@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
         username: true,
         brokerId: true,
         brokerIp: true,
-        brokerPort: true,
+        brokerPort: true
       },
     });
     return NextResponse.json(user);

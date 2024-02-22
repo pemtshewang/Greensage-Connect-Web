@@ -1,12 +1,14 @@
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTrigger, SheetClose } from "@/components/ui/sheet";
 import { Button } from "./ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import UserLabel from "./UserLabel";
 import Icons from "./Icons";
+import Link from "next/link";
 
 export default function Sidebar() {
+  const [SheetCloseWrapper, shetCloseWrapperProps] = [SheetClose, { asChild: true }]
   return (
-    <Sheet>
+    <Sheet >
       <SheetTrigger asChild className="ml-[-12px] fixed top-1/2 z-10 transform -translate-y-1/2">
         <Button>
           <Icons.drawer />
@@ -23,31 +25,36 @@ export default function Sidebar() {
         <div className="w-full bg-black h-1"></div>
         {/* Sidebar content here */}
         <section className="space-y-3 py-5">
-          <a href="/dashboard" className="flex justify-between prose no-underline hover:underline">
-            Dashboard Analytics
-            <Icons.dashboard />
-          </a>
-          <a
-            href="/NewsFeed"
-            className="flex justify-between prose no-underline hover:underline "
-          >
-            News Feeds
-            <Icons.newspaper />
-          </a>
-          <a href="/users" className="flex justify-between prose no-underline hover:underline">
-            Manage Users
-            <Icons.usersGroup />
-          </a>
+          <SheetCloseWrapper {...shetCloseWrapperProps}>
+            <Link href="/dashboard" className="flex justify-between prose no-underline hover:underline">
+              Dashboard Analytics
+              <Icons.dashboard />
+            </Link>
+          </SheetCloseWrapper>
+          <SheetCloseWrapper {...shetCloseWrapperProps}>
+            <Link
+              href="/NewsFeed"
+              className="flex justify-between prose no-underline hover:underline "
+            >
+              News Feeds
+              <Icons.newspaper />
+            </Link>
+          </SheetCloseWrapper>
+          <SheetCloseWrapper {...shetCloseWrapperProps}>
+            <Link href="/users" className="flex justify-between prose no-underline hover:underline">
+              Manage Users
+              <Icons.usersGroup />
+            </Link>
+          </SheetCloseWrapper>
           <div className="divider"></div>
-          <a
-            href="/api/auth/signout"
-            className="flex justify-between prose no-underline hover:underline"
-          >
-            Logout
-            <Icons.logout />
-          </a>
+          <SheetCloseWrapper {...shetCloseWrapperProps}>
+            <Link href="/api/auth/signout" className="flex justify-between prose no-underline hover:underline">
+              Logout session
+              <Icons.logout />
+            </Link>
+          </SheetCloseWrapper>
         </section>
       </SheetContent>
-    </Sheet>
+    </Sheet >
   );
 }

@@ -22,6 +22,7 @@ export async function POST(req: Request) {
       brokerIp: true,
       password: true,
       brokerPort: true,
+      verifiedAt: true,
     },
   });
   const accessToken = await db.accessToken.findUnique({
@@ -30,25 +31,27 @@ export async function POST(req: Request) {
     },
   });
   const isPasswordCorrect = await checkPassword(password, user?.password as string);
+  if (user?.verifiedAt) {
+    delete user["password"];
+    delete user["verifiedAt"];
+    if (isPasswordCorrect) {
+      // Remove password from user object
+      if (user) {
+        const modifiedUser = {
+          ...user,
+          accessToken: accessToken,
+        }
+        console.log('user..', modifiedUser)
+        const userAny = modifiedUser as any;
+        // Add expiration date one month from the current date
+        const expirationDate = new Date();
+        expirationDate.setMonth(expirationDate.getMonth() + 1);
 
-  delete user["password"];
-  if (isPasswordCorrect) {
-    // Remove password from user object
-    if (user) {
-      const modifiedUser = {
-        ...user,
-        accessToken: accessToken,
+        userAny.expirationDate = expirationDate.toISOString();
+        return NextResponse.json(userAny, {
+          status: 200,
+        });
       }
-      console.log('user..', modifiedUser)
-      const userAny = modifiedUser as any;
-      // Add expiration date one month from the current date
-      const expirationDate = new Date();
-      expirationDate.setMonth(expirationDate.getMonth() + 1);
-
-      userAny.expirationDate = expirationDate.toISOString();
-      return NextResponse.json(userAny, {
-        status: 200,
-      });
     }
   }
 

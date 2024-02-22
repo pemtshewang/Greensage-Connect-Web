@@ -17,9 +17,7 @@ import copyToClipboard from "@/utils/clipboard";
 import {
   Select,
   SelectContent,
-  SelectGroup,
   SelectItem,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
@@ -42,9 +40,7 @@ const FormSchema = z.object({
   ap: z.string().min(1),
   apPassword: z.string().min(1),
   brokerUrl: z.string().min(1),
-  brokerPort: z.string().refine((val) => !Number.isNaN(parseInt(val, 10)), {
-    message: "Expected number, received a string",
-  }),
+  brokerPort: z.number(),
   brokerUsername: z.string().min(1),
   brokerPassword: z
     .string()
@@ -398,7 +394,7 @@ export default function GenerateCodeForm({ id }: { id: string }) {
                   <FormField
                     control={form.control}
                     name="brokerPort"
-                    defaultValue={userDetail?.brokerPort as string}
+                    defaultValue={userDetail?.brokerPort}
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Enter the Broker Port</FormLabel>
@@ -464,7 +460,7 @@ export default function GenerateCodeForm({ id }: { id: string }) {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>
-                          {/* Enter the access point name for your controller */}
+                          Enter the access point name for your controller
                         </FormLabel>
                         <FormControl>
                           <Input

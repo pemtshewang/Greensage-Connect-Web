@@ -12,7 +12,6 @@ export interface waterScheduleInterface {
 const WaterChartGraph = ({ waterScheduleRecords }: {
   waterScheduleRecords: waterScheduleInterface[]
 }) => {
-  console.log(waterScheduleRecords);
   const chartRef = useRef(null);
   const tooltipRef = useRef(null);
 
@@ -101,7 +100,7 @@ const WaterChartGraph = ({ waterScheduleRecords }: {
       <div className="flex absolute justify-center container">
         <h3 className="font-mono font-bold">Water Schedule Records</h3>
       </div>
-      <div className="p-4" ref={chartRef}></div> 
+      <div className="p-4" ref={chartRef}></div>
     </div>);
 };
 

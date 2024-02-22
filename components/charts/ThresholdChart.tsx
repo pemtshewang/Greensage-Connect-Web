@@ -10,22 +10,22 @@ const formatDateTime = (isoDate: string) => {
   return format(date, 'yy/MM/dd'); // Format the date and time as desired
 };
 
-const CustomToolTip = ({active, payload, label}) =>{
-  if(active && payload && payload.length){
-    return(
-     <div className="custom-tooltip border border-muted-foreground bg-muted p-2">
+const CustomToolTip = ({ active, payload, label }) => {
+  if (active && payload && payload.length) {
+    return (
+      <div className="custom-tooltip border border-muted-foreground bg-muted p-2">
         <div className="label flex flex-col">
           <span className="p-1 font-bold ">
-          {`Recorded at ${format(label,"EEEE do hh:mm aa",)}`}
+            {`Recorded at ${format(label, "EEEE do hh:mm aa",)}`}
           </span>
           <span className="text-[#69b3a2]">
-          {`soilMoisture : ${payload[0].value}`}
+            {`soilMoisture : ${payload[0].value}`}
           </span>
           <span className="text-[#a367e7]">
-          {`Humidity : ${payload[1].value}`}
+            {`Humidity : ${payload[1].value}`}
           </span>
           <span className="text-[#ff7f0e]">
-          {`Temperature : ${payload[2].value}`}
+            {`Temperature : ${payload[2].value}`}
           </span>
         </div>
       </div>
@@ -52,7 +52,7 @@ const LineGraph = ({ data }) => (
     <LineChart data={data} margin={{ top: 40, right: 30, bottom: 10, left: 30 }}>
       <CartesianGrid strokeDasharray="3 3" />
       <YAxis />
-      <Tooltip content={<CustomToolTip />}/>
+      <Tooltip content={<CustomToolTip />} />
       <Legend />
       <Line type="monotone" dataKey="soilMoisture" stroke="#69b3a2" />
       <Line type="monotone" dataKey="humidity" stroke="#a367e7" />
@@ -66,7 +66,7 @@ const BarChartGraph = ({ data }) => (
     <BarChart data={data} margin={{ top: 40, right: 30, bottom: 10, left: 30 }} barCategoryGap="10%" barSize={20}>
       <CartesianGrid strokeDasharray="3 3" />
       <YAxis />
-      <Tooltip content={<CustomToolTip />}/>
+      <Tooltip content={<CustomToolTip />} />
       <Legend />
       <Bar dataKey="soilMoisture" name="Soil Moisture" fill="#69b3a2" />
       <Bar dataKey="humidity" name="Humidity" fill="#a367e7" />
@@ -95,6 +95,13 @@ export default function ReadingsGraph({ data }: { data: GraphType[] }) {
   return (
     <>
       <div className="graph-selector border-2 relative border-muted-foreground">
+        {
+          !graphData && (
+            <div className="absolute top-[50%] bottom-[50%] left-[39%] text-muted-foreground antialiased">
+              <h5>No data has been recorded as of now</h5>
+            </div>
+          )
+        }
         <h3 className='text-center font-mono font-bold p-3'>Environment Parameter Records Readings</h3>
         <p className="prose px-2">Visualization Graph</p>
         <form>

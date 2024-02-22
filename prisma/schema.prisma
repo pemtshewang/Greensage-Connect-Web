@@ -21,27 +21,27 @@ model Admin {
 }
 
 model User {
-  id                          String                        @id @default(auto()) @map("_id") @db.ObjectId
-  username                    String                        @unique
-  password                    String
-  cid                         String                        @unique
-  mobile                      String                        @unique
-  gewog                       String
-  dzongkhag                   String
-  registeredAt                DateTime                      @default(now())
-  verifiedAt                  DateTime?
-  controllers                 Controller[]
-  accessToken                 AccessToken[]
-  greenhouseCount             Int                           @default(0)
-  irrigationCount             Int                           @default(0)
-  brokerId                    String                        @unique
-  brokerPort                  Int
-  brokerIp                    String
-  Reading                     Reading[]
-  WaterScheduleRecord         WaterScheduleRecord[]
-  SoilMoistureThresholdRecord SoilMoistureThresholdRecord[]
-  TemperatureThresholdRecord  TemperatureThresholdRecord[]
-  HumidityThresholdRecord     HumidityThresholdRecord[]
+  id                  String                @id @default(auto()) @map("_id") @db.ObjectId
+  username            String                @unique
+  password            String
+  cid                 String                @unique
+  mobile              String                @unique
+  gewog               String
+  dzongkhag           String
+  registeredAt        DateTime              @default(now())
+  verifiedAt          DateTime?
+  posLat              String?
+  posLong             String?
+  otp                 Int?
+  otpExpiresAt        DateTime?
+  controllers         Controller[]
+  accessToken         AccessToken[]
+  greenhouseCount     Int                   @default(0)
+  irrigationCount     Int                   @default(0)
+  brokerId            String                @unique
+  brokerPort          Int
+  brokerIp            String
+  WaterScheduleRecord WaterScheduleRecord[]
 }
 
 enum Type {
@@ -72,8 +72,8 @@ model Reading {
   Pressure     Float?
   controller   Controller @relation(fields: [controllerId], references: [controllerId], onDelete: Cascade, onUpdate: Cascade)
   controllerId String
-  User         User       @relation(fields: [brokerId], references: [brokerId], onDelete: Cascade, onUpdate: Cascade)
-  brokerId     String
+  // User         User       @relation(fields: [brokerId], references: [brokerId], onDelete: Cascade, onUpdate: Cascade)
+  // brokerId     String
 }
 
 model WaterScheduleRecord {
@@ -83,8 +83,10 @@ model WaterScheduleRecord {
   repetitionDays Int
   controller     Controller @relation(fields: [controllerId], references: [controllerId], onDelete: Cascade, onUpdate: Cascade)
   controllerId   String
-  User           User       @relation(fields: [brokerId], references: [brokerId], onDelete: Cascade, onUpdate: Cascade)
-  brokerId       String
+  // User           User       @relation(fields: [brokerId], references: [brokerId], onDelete: Cascade, onUpdate: Cascade)
+  // brokerId       String
+  User           User?      @relation(fields: [userId], references: [id])
+  userId         String?    @db.ObjectId
 }
 
 model SoilMoistureThresholdRecord {
@@ -93,8 +95,7 @@ model SoilMoistureThresholdRecord {
   value        Float
   controller   Controller @relation(fields: [controllerId], references: [controllerId], onDelete: Cascade, onUpdate: Cascade)
   controllerId String
-  User         User       @relation(fields: [brokerId], references: [brokerId], onDelete: Cascade, onUpdate: Cascade)
-  brokerId     String
+  // User         User       @relation(fields: [brokerId], references: [brokerId], onDelete: Cascade, onUpdate: Cascade) brokerId     String
 }
 
 model HumidityThresholdRecord {
@@ -103,8 +104,8 @@ model HumidityThresholdRecord {
   value        Float
   controller   Controller @relation(fields: [controllerId], references: [controllerId], onDelete: Cascade, onUpdate: Cascade)
   controllerId String
-  User         User       @relation(fields: [brokerId], references: [brokerId], onDelete: Cascade, onUpdate: Cascade)
-  brokerId     String
+  // User         User       @relation(fields: [brokerId], references: [brokerId], onDelete: Cascade, onUpdate: Cascade)
+  // brokerId     String
 }
 
 model TemperatureThresholdRecord {
@@ -113,8 +114,8 @@ model TemperatureThresholdRecord {
   value        Float
   controller   Controller @relation(fields: [controllerId], references: [controllerId], onDelete: Cascade, onUpdate: Cascade)
   controllerId String
-  User         User       @relation(fields: [brokerId], references: [brokerId], onDelete: Cascade, onUpdate: Cascade)
-  brokerId     String
+  // User         User       @relation(fields: [brokerId], references: [brokerId], onDelete: Cascade, onUpdate: Cascade)
+  // brokerId     String
 }
 
 model NewsFeeds {

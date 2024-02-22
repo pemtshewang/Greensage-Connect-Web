@@ -67,8 +67,8 @@ function generateCode(credentials: {
     const char * mqtt_username = "${credentials.brokerUsername}";
     const char * mqtt_password = "${credentials.brokerPassword}";
     const int mqtt_port = ${credentials.brokerPort};
-    static String controllerBrokerId = "${credentials.controllerId}";
-    static String userBrokerId = "${credentials.brokerUserId}";
+    static String controllerBrokerId = "${credentials.controllerBrokerId}";
+    static String userBrokerId = "${credentials.userBrokerId}";
     unsigned long lastMqttPublishTime = 0;
 
     // pin config

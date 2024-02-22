@@ -11,42 +11,47 @@ export async function GET(request: NextRequest) {
         id: id as string
       },
       select: {
-        WaterScheduleRecord: {
+        controllers: {
           select: {
-            startTime: true,
-            endTime: true,
-            repetitionDays: true
+            waterScheduleRecords: {
+              select: {
+                startTime: true,
+                endTime: true,
+                repetitionDays: true
+              }
+            },
+            HumidityThresholdRecord: {
+              select: {
+                value: true,
+                recordedAt: true
+              }
+            },
+            TemperatureThresholdRecord: {
+              select: {
+                value: true,
+                recordedAt: true
+              }
+            },
+            soilMoistureThresholdRecords: {
+              select: {
+                value: true,
+                recordedAt: true
+              }
+            },
+            readings: {
+              select: {
+                recordedAt: true,
+                Pressure: true,
+                temperature: true,
+                soilMoisture: true,
+                humidity: true,
+              }
+            },
           }
-        },
-        HumidityThresholdRecord: {
-          select: {
-            value: true,
-            recordedAt: true
-          }
-        },
-        TemperatureThresholdRecord: {
-          select: {
-            value: true,
-            recordedAt: true
-          }
-        },
-        SoilMoistureThresholdRecord: {
-          select: {
-            value: true,
-            recordedAt: true
-          }
-        },
-        Reading: {
-          select: {
-            recordedAt: true,
-            Pressure: true,
-            temperature: true,
-            soilMoisture: true,
-            humidity: true,
-          }
-        },
+        }
       }
     })
+    console.log(userData);
     return NextResponse.json(userData);
   }
   return NextResponse.json({ message: "Not Authorized" }, { status: 401 })

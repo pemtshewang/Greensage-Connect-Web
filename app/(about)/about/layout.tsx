@@ -17,7 +17,7 @@ const Layout = ({ children }: {
         <div className="absolute top-[20%] bottom-[50%] right-[10%]">
           <DownloadPage />
         </div>
-        <Footer />
+        <Footer className="flex space-x-2 absolute bottom-0 right-0 px-2 text-white" />
       </div>
     </>
   )
