@@ -8,18 +8,28 @@ import { Suspense, useEffect, useState } from "react"
 import { format } from "date-fns";
 import ThresholdRecordGraph from "@/components/charts/EnvtParameters"
 import WaterChartGraph, { waterScheduleInterface } from "@/components/charts/WaterSchedule"
-import { getUserAnalyticsData } from "@/app/actions"
+
+const getUserAnalyticsData = async ({ id }: { id: string }) => {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/dashboard/user/analytics?id=${id}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json"
+    }
+  });
+  const data = await res.json();
+  return data;
+}
 
 interface AnalyticsType {
-  Reading: ReadingsParameterType[]
+  readings: ReadingsParameterType[]
   TemperatureThresholdRecord: {
     recordedAt: string, value: number
   }[],
-  SoilMoistureThresholdRecord: {
+  soilMoistureThresholdRecords: {
     recordedAt: string,
     value: number,
   }[],
-  WaterScheduleRecord: {
+  waterScheduleRecords: {
     startTime: string,
     endTime: string,
     repetitionDays: number,
@@ -43,17 +53,18 @@ const UserAnalyticPage = () => {
   useEffect(() => {
     getUserAnalyticsData({ id: id as string }).then((res) => {
       setUserData(res);
+      console.log("data is->", res)
     });
-  }, []);
+  }, [id]);
 
   useEffect(() => {
     if (data) {
       setThresholdData({
         TemperatureThresholdRecord: data.TemperatureThresholdRecord,
         HumidityThresholdRecord: data.HumidityThresholdRecord,
-        SoilMoistureThresholdRecord: data.SoilMoistureThresholdRecord
+        SoilMoistureThresholdRecord: data.soilMoistureThresholdRecords
       });
-      setWSData(data.WaterScheduleRecord);
+      setWSData(data.waterScheduleRecords);
       setGenerating(false); // Move setGenerating inside the callback to ensure it runs after setting userData
     }
   }, [data]);
@@ -79,7 +90,7 @@ const UserAnalyticPage = () => {
                 </p>
               </span>
             </div>
-            <ReadingsGraph data={data?.Reading as ReadingsParameterType[]} />
+            <ReadingsGraph data={data?.readings as ReadingsParameterType[]} />
             <ThresholdRecordGraph data={thresholdData as ThresholdRecordsType} />
             <Suspense fallback={<div>loading...</div>}>
               {

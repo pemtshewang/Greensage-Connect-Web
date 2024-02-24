@@ -57,7 +57,7 @@ export async function GET(req: NextRequest) {
     const isValid = await db.accessToken.findUnique({
       where: {
         token,
-        createdAt: {
+        expiresAt: {
           gte: new Date(new Date().getTime() - 60 * 60 * 24 * 1000),
         },
       },
@@ -70,6 +70,7 @@ export async function GET(req: NextRequest) {
       });
       return NextResponse.json(newsFeeds);
     }
+    return NextResponse.json({ message: "Authorization token not valid", status: 401 });
   } else {
     // Handle the case where the token is not provided or is not in the correct format
     return NextResponse.json({ message: 'Token invalid or expired' }, { status: 401 });

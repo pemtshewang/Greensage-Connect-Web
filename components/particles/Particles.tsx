@@ -85,9 +85,6 @@ export const ParticlesComponent = () => {
         move: {
           // direction: ,
           enable: true,
-          outModes: {
-            // default: OutMode.out,
-          },
           random: false,
           speed: 4,
           straight: false,

@@ -52,9 +52,10 @@ const WaterChartGraph = ({ waterScheduleRecords }: {
       ])
       .range([0, width]);
 
+    //@ts-ignore
     const y = d3
       .scaleBand()
-      .domain(d3.range(waterScheduleRecords.length))
+      .domain(d3.range(waterScheduleRecords.length) as unknown as string[])
       .range([0, height])
       .padding(0.1)
       .paddingOuter(0.2); // Adjust outer padding for better visualization
@@ -88,8 +89,9 @@ const WaterChartGraph = ({ waterScheduleRecords }: {
       });
 
     svg.append("g").attr("transform", `translate(0, ${height})`).call(d3.axisBottom(x));
-    svg.append("g").call(d3.axisLeft().scale(y).tickFormat(() => ""));
-  }, []);
+    const leftAxis = svg.append("g"); // Create a new g for the left axis
+    leftAxis.call(d3.axisLeft(y).tickFormat(() => "")); // Apply axis to g
+  }, [waterScheduleRecords]);
   return (
     <div className="relative border-2 border-muted-foreground p-5 overflow-hidden">
       <div

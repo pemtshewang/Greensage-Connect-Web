@@ -10,11 +10,23 @@ function getRandomDigits(): number {
   const formattedDigits = randomDigits.toString().padStart(6, '0'); // Ensure it's 6 digits long
   return Number(formattedDigits);
 }
-
+interface User {
+  username: string
+  password: string
+  cid: string
+  mobile: string
+  gewog: string
+  dzongkhag: string
+  brokerId: string
+  brokerIp: string
+  brokerPort: number
+  posLat?: string
+  posLong?: string
+}
 export async function POST(req: Request) {
   const { username, password, cid, mobile, gewog, dzongkhag, location } = await req.json();
   const brokerId = generateBrokerId(username as string, mobile as string);
-  const trimmedUser = {
+  const trimmedUser: User = {
     username: username.trim(),
     password: password.trim(),
     cid: cid.trim(),
@@ -23,7 +35,7 @@ export async function POST(req: Request) {
     dzongkhag: dzongkhag.trim(),
     brokerId: brokerId,
     brokerIp: "192.168.137.73",
-    brokerPort: 8083,
+    brokerPort: 1883,
   }
   if (location) {
     trimmedUser.posLat = location.latitude as string,

@@ -156,7 +156,7 @@ export default function GenerateCodeForm({ id }: { id: string }) {
         setFetching(false);
       });
     });
-  }, []);
+  }, [id]);
   useEffect(() => {
     if (controllerId !== "") {
       setFormLoading(true);
@@ -170,7 +170,7 @@ export default function GenerateCodeForm({ id }: { id: string }) {
         setFormLoading(false);
       });
     }
-  }, [controllerId]);
+  }, [controllerId, id, form]);
   function onSubmit(data: z.infer<typeof FormSchema>) {
     setRecievingCode(true);
     generateCode(data).then((res) => {
@@ -270,12 +270,12 @@ export default function GenerateCodeForm({ id }: { id: string }) {
                     <SelectContent>
                       {type === "greenhouse"
                         ? greenhouseControllers.map((controller) => (
-                          <SelectItem value={controller.controllerId}>
+                          <SelectItem key={controller.controllerId} value={controller.controllerId}>
                             {controller.name} : {controller.controllerId}
                           </SelectItem>
                         ))
                         : irrigationControllers.map((controller) => (
-                          <SelectItem value={controller.controllerId}>
+                          <SelectItem value={controller.controllerId} key={controller.controllerId}>
                             {controller.name} : {controller.controllerId}
                           </SelectItem>
                         ))}
@@ -394,15 +394,15 @@ export default function GenerateCodeForm({ id }: { id: string }) {
                   <FormField
                     control={form.control}
                     name="brokerPort"
-                    defaultValue={userDetail?.brokerPort}
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Enter the Broker Port</FormLabel>
                         <FormControl>
                           <Input
+                            defaultValue={Number(userDetail?.brokerPort)}
                             type="number"
                             className="max-w-sm"
-                            {...field}
+                            {...form.register('brokerPort', { valueAsNumber: true })}
                           />
                         </FormControl>
                         <FormDescription>

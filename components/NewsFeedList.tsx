@@ -2,12 +2,14 @@
 import { useContext, useEffect, useState } from "react";
 import { NewsFeedCardSkeleton } from "./NewsFeedSkeleton";
 import { NewsFeedType } from "@/types";
-import { NewsFeedContainerCard } from "./NewsFeedContainer";
 import NewsFeedContext from "@/context/newsFeedContext";
 import PaginatedNewsFeed from "./NewsFeedPagination";
 
 const fetchNewsFeed = async () => {
-  const res = await fetch("/api/feeds/admin");
+  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/feeds/admin`, {
+    method: "GET",
+    cache: "no-store"
+  });
   const data = await res.json();
   return data;
 }

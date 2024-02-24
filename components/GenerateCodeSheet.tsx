@@ -1,28 +1,23 @@
-"use client"
-
 import {
   Sheet,
   SheetContent,
-  SheetDescription,
   SheetHeader,
   SheetTitle,
+  SheetTrigger,
 } from "@/components/ui/sheet"
+import GenerateCodeForm from "./forms/GenerateCodeForm"
 
-export default function CodeGenerateSheet({ isOpen, handleOpen, children }:
-  {
-    children: React.ReactNode,
-    isOpen: boolean;
-    handleOpen: (open: boolean) => void
-  }) {
+export default function CodeGenerateSheet({ id }: { id: string }) {
   return (
-    <Sheet open={isOpen} onOpenChange={handleOpen}>
+    <Sheet>
+      <SheetTrigger className="text-sm ml-2">
+        Generate Code
+      </SheetTrigger>
       <SheetContent className="max-w-none  lg:w-[740px]" side="right" >
         <SheetHeader>
           <SheetTitle>Generate Code for Controller</SheetTitle>
-          <SheetDescription>
-            {children}
-          </SheetDescription>
         </SheetHeader>
+        <GenerateCodeForm id={id} />
       </SheetContent>
     </Sheet>
   )

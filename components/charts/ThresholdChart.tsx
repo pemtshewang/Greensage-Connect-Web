@@ -5,18 +5,17 @@ import { ResponsiveContainer, AreaChart, Area, LineChart, Line, BarChart, Bar, X
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { format } from "date-fns";
 
-const formatDateTime = (isoDate: string) => {
-  const date = new Date(isoDate);
-  return format(date, 'yy/MM/dd'); // Format the date and time as desired
-};
-
-const CustomToolTip = ({ active, payload, label }) => {
+const CustomToolTip = ({ active, payload, label }: {
+  active?: any;
+  payload?: any;
+  label?: any;
+}) => {
   if (active && payload && payload.length) {
     return (
       <div className="custom-tooltip border border-muted-foreground bg-muted p-2">
         <div className="label flex flex-col">
           <span className="p-1 font-bold ">
-            {`Recorded at ${format(label, "EEEE do hh:mm aa",)}`}
+            {`Recorded at ${format(new Date(payload[0].payload.recordedAt), "EEEE do hh:mm aa",)}`}
           </span>
           <span className="text-[#69b3a2]">
             {`soilMoisture : ${payload[0].value}`}
@@ -82,12 +81,13 @@ export interface ReadingsParameterType {
   temperature: number
 }
 
-export default function ReadingsGraph({ data }: { data: GraphType[] }) {
+
+export default function ReadingsGraph({ data }: { data: ReadingsParameterType[] }) {
   const [selectedGraph, setSelectedGraph] = useState('line');
-  const [graphData, setGraphData] = useState<GraphType[]>([]);
+  const [graphData, setGraphData] = useState<ReadingsParameterType[]>([]);
   useEffect(() => {
     setGraphData(data);
-  }, [])
+  }, [data])
   const handleGraphChange = (chart) => {
     setSelectedGraph(chart);
   };
@@ -96,10 +96,12 @@ export default function ReadingsGraph({ data }: { data: GraphType[] }) {
     <>
       <div className="graph-selector border-2 relative border-muted-foreground">
         {
-          !graphData && (
-            <div className="absolute top-[50%] bottom-[50%] left-[39%] text-muted-foreground antialiased">
-              <h5>No data has been recorded as of now</h5>
-            </div>
+          data && (
+            graphData.length < 1 && (
+              <div className="absolute top-[50%] bottom-[50%] left-[39%] text-muted-foreground antialiased">
+                <h5>No data has been recorded as of now</h5>
+              </div>
+            )
           )
         }
         <h3 className='text-center font-mono font-bold p-3'>Environment Parameter Records Readings</h3>

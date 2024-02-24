@@ -10,7 +10,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Checkbox } from "@/components/ui/checkbox"
 import { userTableColumnSchemaType } from "@/types"
 import { format } from "date-fns";
 import { toast } from "sonner"
@@ -94,10 +93,6 @@ export const columns: ColumnDef<userTableColumnSchemaType>[] = [
     id: "actions",
     cell: ({ row }) => {
       const user = row.original
-      const [isOpen, setIsOpen] = useState(false);
-      const handleOpen = () => {
-        setIsOpen(prevState => !prevState)
-      }
       return (
         <>
           <DropdownMenu>
@@ -117,43 +112,15 @@ export const columns: ColumnDef<userTableColumnSchemaType>[] = [
                 </span>
               </DropdownMenuItem>
               <DropdownMenuItem
-                onClick={handleOpen}
-                className="flex space-x-3">
-                <span>
-                  Generate Code
-                </span>
+                className="flex space-x-3" asChild>
+                <GenerateCode id={row.original.id} />
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem>View Details</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          <GenerateCode id={row.original.id} handleOpen={handleOpen} isOpen={isOpen} />
         </>
       )
     },
   },
-  {
-    id: "select",
-    header: ({ table }) => (
-      <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && "indeterminate")
-        }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-      />
-    ),
-    cell: ({ row }) => (
-      <div className="p-2">
-        <Checkbox
-          checked={row.getIsSelected()}
-          onCheckedChange={(value) => row.toggleSelected(!!value)}
-          aria-label="Select row"
-        />
-      </div>
-    ),
-    enableSorting: false,
-    enableHiding: false,
-  }
 ]

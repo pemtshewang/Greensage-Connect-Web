@@ -170,6 +170,7 @@ export const RecentlyJoinedList = () => {
             ) : users.length > 0 ? (
               users.map((item) => (
                 <UserRecentJoinedCard
+                  key={item.username}
                   date={item?.registeredAt as string}
                   name={item?.username as string}
                   gewog={item?.gewog as string}

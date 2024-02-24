@@ -51,8 +51,48 @@ export async function GET(request: NextRequest) {
         }
       }
     })
-    console.log(userData);
-    return NextResponse.json(userData);
+
+    const combinedData: {
+      readings: {
+        Pressure: number | null;
+        soilMoisture: number | null;
+        temperature: number | null;
+        humidity: number | null;
+        recordedAt: Date;
+      }[];
+      waterScheduleRecords: {
+        startTime: string;
+        endTime: string;
+        repetitionDays: number;
+      }[];
+      HumidityThresholdRecord: {
+        recordedAt: Date;
+        value: number;
+      }[];
+      TemperatureThresholdRecord: {
+        recordedAt: Date;
+        value: number;
+      }[];
+      soilMoistureThresholdRecords: {
+        recordedAt: Date;
+        value: number;
+      }[];
+    } = {
+      readings: [],
+      waterScheduleRecords: [],
+      HumidityThresholdRecord: [],
+      TemperatureThresholdRecord: [],
+      soilMoistureThresholdRecords: []
+    };
+
+    userData?.controllers.forEach(controller => {
+      combinedData.readings = combinedData.readings.concat(controller.readings);
+      combinedData.waterScheduleRecords = combinedData.waterScheduleRecords.concat(controller.waterScheduleRecords);
+      combinedData.HumidityThresholdRecord = combinedData.HumidityThresholdRecord.concat(controller.HumidityThresholdRecord);
+      combinedData.TemperatureThresholdRecord = combinedData.TemperatureThresholdRecord.concat(controller.TemperatureThresholdRecord);
+      combinedData.soilMoistureThresholdRecords = combinedData.soilMoistureThresholdRecords.concat(controller.soilMoistureThresholdRecords);
+    });
+    return NextResponse.json(combinedData);
   }
   return NextResponse.json({ message: "Not Authorized" }, { status: 401 })
 }

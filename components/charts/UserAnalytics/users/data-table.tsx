@@ -68,7 +68,7 @@ export function DataTable<TData, TValue>({
   })
   useEffect(() => {
     table.setPageSize(7);
-  }, [])
+  }, [table])
   return (
     <div className="px-4">
       <div className="flex items-center py-4">

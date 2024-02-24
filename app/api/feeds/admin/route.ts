@@ -26,7 +26,7 @@ export async function DELETE(req: NextRequest) {
   const id = req.nextUrl.searchParams.get("id");
   const res = await db.newsFeeds.delete(({
     where: {
-      id
+      id: id as string
     }
   }));
   if (res) {

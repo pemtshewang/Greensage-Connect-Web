@@ -1,6 +1,7 @@
 "use client";
 
 import { format } from "date-fns";
+import Image from "next/image";
 import {
   Card,
   CardContent,
@@ -12,7 +13,7 @@ import { useContext } from "react";
 import NewsFeedContext from "@/context/newsFeedContext";
 
 async function DeleteNewsFeed(id: string) {
-  const res = await fetch(`http://localhost:3000/api/newsfeed/admin/?id=${id}`, {
+  const res = await fetch(`http://${process.env.NEXT_PUBLIC_BASEURL}/api/newsfeed/admin/?id=${id}`, {
     method: "DELETE",
     cache: "no-store",
   });
@@ -41,7 +42,7 @@ export function NewsFeedContainerCard({
     const isDeleted = await DeleteNewsFeed(id);
     if (isDeleted) {
       toast.success(isDeleted.message);
-      setIsChanged(prevState => !prevState)
+      setIsChanged((prevState: boolean) => !prevState)
     } else {
       toast.error("Something went wrong");
     }
@@ -52,7 +53,7 @@ export function NewsFeedContainerCard({
         <Card className="w-full">
           <CardContent>
             <div className="flex justify-center py-5">
-              <img
+              <Image
                 src={image}
                 width={300}
                 height={400}
