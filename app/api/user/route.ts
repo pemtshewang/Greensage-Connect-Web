@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { hashPassword } from "@/utils/bcryptMgr";
 import { db } from "@/lib/db";
 import { verifyNumber } from "@/utils/verify-sms";
@@ -23,42 +23,39 @@ interface User {
   posLat?: string
   posLong?: string
 }
-export async function POST(req: Request) {
-  const { username, password, cid, mobile, gewog, dzongkhag, location } = await req.json();
-  const brokerId = generateBrokerId(username as string, mobile as string);
+export async function POST(req: NextRequest) {
+  const form = await req.formData();
+  const brokerId = generateBrokerId(form.get("username").toString().trim(), form.get("username").toString().trim());
+  const lat = form.get("lat").toString();
+  const long = form.get("long").toString();
+
   const trimmedUser: User = {
-    username: username.trim(),
-    password: password.trim(),
-    cid: cid.trim(),
-    mobile: mobile.trim(),
-    gewog: gewog.trim(),
-    dzongkhag: dzongkhag.trim(),
+    username: form.get("username").toString().trim(),
+    password: form.get("password").toString().trim(),
+    cid: form.get("cid").toString().trim(),
+    mobile: form.get("mobile").toString().trim(),
+    gewog: form.get("gewog").toString().trim(),
+    dzongkhag: form.get("dzongkhag").toString().trim(),
     brokerId: brokerId,
     brokerIp: "192.168.137.73",
-    brokerPort: 1883,
+    brokerPort: 8083,
   }
-  if (location) {
-    trimmedUser.posLat = location.latitude as string,
-      trimmedUser.posLong = location.longitude as string
+
+  if (lat && long) {
+    trimmedUser.posLat = lat
+    trimmedUser.posLong = long
+    console.log(trimmedUser)
   }
-  const hashedPassword = await hashPassword(password);
+  const hashedPassword = await hashPassword(form.get("password").toString());
   const user = await db.user.create({
     data: {
       ...trimmedUser,
       password: hashedPassword, // Use the hashed password
     },
   });
-
-  if (!user) {
-    return NextResponse.json(
-      {
-        message: "There was an error while creating the user",
-      },
-      { status: 500 }
-    );
-  }
-  const validNumber = await verifyNumber(mobile);
+  const validNumber = await verifyNumber(form.get("mobile").toString());
   if (validNumber) {
+    console.log("is valid")
     const randomDigits = getRandomDigits();
     const expirationTime = new Date(new Date().getTime() + 10 * 60000);
     await db.user.update({
@@ -69,7 +66,7 @@ export async function POST(req: Request) {
         otp: randomDigits,
         otpExpiresAt: expirationTime
       }
-    })
+    });
     return NextResponse.json({
       id: user.id,
       code: randomDigits
@@ -82,10 +79,10 @@ export async function POST(req: Request) {
     { status: 500 }
   );
 }
-export async function DELETE(req: Request, res: Response) {
+
+export async function DELETE(req: Request) {
   const userIsAuthenticated = await getUser();
   const { id } = await req.json();
-  console.log("delete id received", id);
   if (userIsAuthenticated) {
     const user = await db.user.delete({
       where: {

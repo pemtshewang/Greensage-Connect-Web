@@ -399,7 +399,7 @@ export default function GenerateCodeForm({ id }: { id: string }) {
                         <FormLabel>Enter the Broker Port</FormLabel>
                         <FormControl>
                           <Input
-                            defaultValue={Number(userDetail?.brokerPort)}
+                            defaultValue={1883}
                             type="number"
                             className="max-w-sm"
                             {...form.register('brokerPort', { valueAsNumber: true })}

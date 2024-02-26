@@ -16,8 +16,8 @@ export async function verifyNumber(phoneNumber: string) {
     if (isValid) {
       return true;
     }
-    return null;
   } catch (err) {
+    console.log(err)
     return null;
   }
 }

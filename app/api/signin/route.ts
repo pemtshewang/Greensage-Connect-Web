@@ -16,7 +16,7 @@ export async function POST(req: Request, res: Response) {
       return NextResponse.json(user, { status: 200 });
     }
     return NextResponse.json(null, { status: 401 });
-  }else{
+  } else {
     console.log("User not found");
   }
   return NextResponse.json(null, { status: 401 });

@@ -7,23 +7,17 @@ export async function GET(req: Request) {
   if (user) {
     const list = await db.user.findMany({
       where: {
-        AND: [
-          {
-            posLong: {
-              not: undefined
-            }
+        AND: {
+          posLat: {
+            not: null
           },
-          {
-            posLat: {
-              not: undefined
-            }
+          posLong: {
+            not: null
           },
-          {
-            verifiedAt: {
-              not: undefined
-            }
+          verifiedAt: {
+            not: null
           }
-        ]
+        }
       },
       select: {
         posLat: true,
