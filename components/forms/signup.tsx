@@ -28,6 +28,7 @@ export default function SignupForm() {
       method: "POST",
       cache: "no-store",
     });
+    console.log(res.ok);
     if (res) {
       setLoading(false);
       toast.success("SignUp Successful, Please Login!");

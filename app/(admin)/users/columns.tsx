@@ -17,13 +17,13 @@ import { useState } from "react"
 import GenerateCode from "@/components/GenerateCodeScreen"
 
 const deleteUserById = async (id: string) => {
-  const res = await fetch("http://localhost:3000/api/user", {
+  const res = await fetch(`http://${process.env.NEXT_PUBLIC_BASE_URL}/api/user`, {
     method: "DELETE",
     headers: {
       "Content-Type": "application/json"
     },
-    body: JSON.stringify({ id })
-  })
+    body: JSON.stringify({ id }), 
+    cache: "no-store" });
   if (res.ok) {
     toast.success("User deleted successfully")
     return true
@@ -42,8 +42,7 @@ export const columns: ColumnDef<userTableColumnSchemaType>[] = [
     header: ({ column }) => {
       return (
         <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
           Citizen ID
           <ArrowUpDown className="ml-2 h-4 w-4" />
