@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
     gewog: form.get("gewog").toString().trim(),
     dzongkhag: form.get("dzongkhag").toString().trim(),
     brokerId: brokerId,
-    brokerIp: "192.168.137.73",
+    brokerIp: "192.168.137.180",
     brokerPort: 8083,
   }
 

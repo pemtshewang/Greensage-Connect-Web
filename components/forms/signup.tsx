@@ -24,11 +24,13 @@ export default function SignupForm() {
   const handleSubmittedData = async (data: signUpSchemaType) => {
     setLoading(true);
     const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/signup`, {
-      body: JSON.stringify(data),
       method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
       cache: "no-store",
+      body: JSON.stringify(data),
     });
-    console.log(res.ok);
     if (res) {
       setLoading(false);
       toast.success("SignUp Successful, Please Login!");

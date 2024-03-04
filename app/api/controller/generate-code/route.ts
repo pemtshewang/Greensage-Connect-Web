@@ -66,7 +66,7 @@ function generateCode(credentials: {
     const char * mqtt_server = "${credentials.brokerUrl}";
     const char * mqtt_username = "${credentials.brokerUsername}";
     const char * mqtt_password = "${credentials.brokerPassword}";
-    const int mqtt_port = ${credentials.brokerPort};
+    const int mqtt_port = 1883;
     static String controllerBrokerId = "${credentials.controllerBrokerId}";
     static String userBrokerId = "${credentials.userBrokerId}";
     unsigned long lastMqttPublishTime = 0;
