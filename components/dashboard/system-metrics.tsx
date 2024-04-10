@@ -1,11 +1,13 @@
-"use client"
+"use client";
 import Iframe from "react-iframe";
 import { useEffect, useState } from "react";
 import Icons from "../Icons";
-
+import Image from "next/image";
 
 const SystemMetricsPage = () => {
-  const [url, setUrl] = useState<string>(process.env.NEXT_PUBLIC_GRAPHANA_DASHBOARD_URL as string);
+  const [url, setUrl] = useState<string>(
+    process.env.NEXT_PUBLIC_GRAPHANA_DASHBOARD_URL as string,
+  );
   const [graphLoading, setGraphLoading] = useState(true); // State for your custom loading state
   const [iframeLoaded, setIframeLoaded] = useState(false); // State to track iframe loading
 
@@ -28,7 +30,9 @@ const SystemMetricsPage = () => {
       {graphLoading && (
         <div className="container flex flex-col items-center space-y-2 lg:mt-40">
           <Icons.metricsLoading width={72} height={72} />
-          <h5 className="animate-pulse delay-1000 font-mono text-sm">Generating System Metrics Analytics</h5>
+          <h5 className="animate-pulse delay-1000 font-mono text-sm">
+            Generating System Metrics Analytics
+          </h5>
         </div>
       )}
 
@@ -37,20 +41,35 @@ const SystemMetricsPage = () => {
         <>
           <span className="container flex space-x-4 mb-2">
             <Icons.info />
-            <code className="text-muted-foreground">The graph is externally powered and rendered through graphana public dashboard</code>
+            <code className="text-muted-foreground">
+              The graph is externally powered and rendered through graphana
+              public dashboard
+            </code>
           </span>
 
-          <Iframe
-            url={url}
-            frameBorder={0}
-            className={`container lg:h-[130vh] ${iframeLoaded ? '' : 'hidden'}`}
-            onLoad={handleIframeLoad}
+          {/* <Iframe */}
+          {/*   url={url} */}
+          {/*   frameBorder={0} */}
+          {/*   className={`container lg:h-[130vh] ${iframeLoaded ? '' : 'hidden'}`} */}
+          {/*   onLoad={handleIframeLoad} */}
+          {/* /> */}
+          <Image
+            src="/images/grafana1.png"
+            height={500}
+            width={window.outerWidth}
+            alt="dashboard image"
+          />
+          <Image
+            src="/images/grafana2.png"
+            className="mt-[-10px]"
+            height={500}
+            width={window.outerWidth}
+            alt="dashboard image"
           />
         </>
       )}
     </div>
-  )
-}
+  );
+};
 
 export default SystemMetricsPage;
-

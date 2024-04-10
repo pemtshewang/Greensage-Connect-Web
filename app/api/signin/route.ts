@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { checkPassword } from "@/utils/bcryptMgr";
 
-export async function POST(req: Request, res: Response) {
+export async function POST(req: Request) {
   const { username, password } = await req.json();
   const user = await db.admin.findUnique({
     where: {
@@ -11,7 +11,6 @@ export async function POST(req: Request, res: Response) {
   });
   const passwordMatch = await checkPassword(password, user?.password as string);
   if (user) {
-    console.log("User found");
     if (passwordMatch) {
       return NextResponse.json(user, { status: 200 });
     }

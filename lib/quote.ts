@@ -1,5 +1,124 @@
-export const quotes = [
-  "Being a small nation makes us a smart nation, this is not out of choice but out of necessity. Technology is an indespensible tool that will be necessary to realise this aspiration",
-  "We must always stand united  in spirit and purpose, we must always be one nation with common goals and aspirations",
-  "No matter what task you are assigned with or whatever responsibilities that you need to shoulder, give it your best!"
-]
+export const quote = [
+  {
+    text: "Being",
+    className: "tracking-wider"
+  },
+  { text: "a" },
+  {
+    text: "small",
+    className: "tracking-wider"
+  },
+  {
+    text: "nation",
+    className: "tracking-wider"
+  },
+  {
+    text: "makes",
+    className: "tracking-wider"
+  },
+  {
+    text: "us",
+    className: "tracking-wider"
+  },
+  { text: "a" },
+  {
+    text: "smart",
+    className: "tracking-wider"
+  },
+  {
+    text: "nation,",
+    className: "tracking-wider"
+  },
+  {
+    text: "this",
+    className: "tracking-wider"
+  },
+  {
+    text: "is",
+    className: "tracking-wider"
+  },
+  {
+    text: "not",
+    className: "tracking-wider"
+  },
+  {
+    text: "out",
+    className: "tracking-wider"
+  },
+  {
+    text: "of",
+    className: "tracking-wider"
+  },
+  {
+    text: "choice",
+    className: "tracking-wider"
+  },
+  {
+    text: "but",
+    className: "tracking-wider"
+  },
+  {
+    text: "out",
+    className: "tracking-wider"
+  },
+  {
+    text: "of",
+    className: "tracking-wider"
+  },
+  {
+    text: "necessity.",
+    className: "tracking-wider"
+  },
+  {
+    text: "Technology",
+    className: "tracking-wider"
+  },
+  {
+    text: "is",
+    className: "tracking-wider"
+  },
+  {
+    text: "an",
+    className: "tracking-wider"
+  },
+  {
+    text: "indespensible",
+    className: "tracking-wider"
+  },
+  {
+    text: "tool",
+    className: "tracking-wider"
+  },
+  {
+    text: "that",
+    className: "tracking-wider"
+  },
+  {
+    text: "will",
+    className: "tracking-wider"
+  },
+  {
+    text: "be",
+    className: "tracking-wider"
+  },
+  {
+    text: "necessary",
+    className: "tracking-wider"
+  },
+  {
+    text: "to",
+    className: "tracking-wider"
+  },
+  {
+    text: "realise",
+    className: "tracking-wider"
+  },
+  {
+    text: "this",
+    className: "tracking-wider"
+  },
+  {
+    text: "aspiration.",
+    className: "tracking-wider"
+  },
+];

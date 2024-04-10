@@ -4,28 +4,28 @@ import { db } from "@/lib/db";
 import { verifyNumber } from "@/utils/verify-sms";
 import { getUser } from "@/lib/session";
 import { generateBrokerId } from "./verify-user/emqx";
+import { getRandomDigits } from "@/utils/otp-generator";
+import { sendUserOTP } from "@/utils/sms-gateway";
 
-function getRandomDigits(): number {
-  const randomDigits = Math.floor(Math.random() * 1000000); // Generate a random number between 0 and 999999
-  const formattedDigits = randomDigits.toString().padStart(6, '0'); // Ensure it's 6 digits long
-  return Number(formattedDigits);
-}
 interface User {
-  username: string
-  password: string
-  cid: string
-  mobile: string
-  gewog: string
-  dzongkhag: string
-  brokerId: string
-  brokerIp: string
-  brokerPort: number
-  posLat?: string
-  posLong?: string
+  username: string;
+  password: string;
+  cid: string;
+  mobile: string;
+  gewog: string;
+  dzongkhag: string;
+  brokerId: string;
+  brokerIp: string;
+  brokerPort: number;
+  posLat?: string;
+  posLong?: string;
 }
 export async function POST(req: NextRequest) {
   const form = await req.formData();
-  const brokerId = generateBrokerId(form.get("username").toString().trim(), form.get("username").toString().trim());
+  const brokerId = generateBrokerId(
+    form.get("username").toString().trim(),
+    form.get("username").toString().trim(),
+  );
   const lat = form.get("lat").toString();
   const long = form.get("long").toString();
 
@@ -39,12 +39,12 @@ export async function POST(req: NextRequest) {
     brokerId: brokerId,
     brokerIp: "192.168.137.180",
     brokerPort: 8083,
-  }
+  };
 
   if (lat && long) {
-    trimmedUser.posLat = lat
-    trimmedUser.posLong = long
-    console.log(trimmedUser)
+    trimmedUser.posLat = lat;
+    trimmedUser.posLong = long;
+    console.log(trimmedUser);
   }
   const hashedPassword = await hashPassword(form.get("password").toString());
   const user = await db.user.create({
@@ -53,30 +53,40 @@ export async function POST(req: NextRequest) {
       password: hashedPassword, // Use the hashed password
     },
   });
+  // verify if the provided number is valid or not
   const validNumber = await verifyNumber(form.get("mobile").toString());
+  //
+  // if given number is valid
   if (validNumber) {
-    console.log("is valid")
-    const randomDigits = getRandomDigits();
+    const otpDigits = getRandomDigits().toString();
     const expirationTime = new Date(new Date().getTime() + 10 * 60000);
-    await db.user.update({
-      where: {
-        id: user.id
-      },
-      data: {
-        otp: randomDigits,
-        otpExpiresAt: expirationTime
-      }
+    const sendOTP = await sendUserOTP({
+      otpDigits,
+      phoneNumber: form.get("mobile").toString(),
     });
-    return NextResponse.json({
-      id: user.id,
-      code: randomDigits
-    }, { status: 200 });
+    if (sendOTP.success) {
+      await db.user.update({
+        where: {
+          id: user.id,
+        },
+        data: {
+          otp: Number(otpDigits),
+          otpExpiresAt: expirationTime,
+        },
+      });
+      return NextResponse.json(
+        {
+          id: user.id,
+        },
+        { status: 200 },
+      );
+    }
   }
   return NextResponse.json(
     {
       message: "There was an error while creating the user",
     },
-    { status: 500 }
+    { status: 500 },
   );
 }
 
@@ -94,17 +104,20 @@ export async function DELETE(req: Request) {
         {
           message: "There was an error while deleting the user",
         },
-        { status: 500 }
+        { status: 500 },
       );
     }
     return NextResponse.json(
       {
         message: "User deleted successfully",
       },
-      { status: 200 }
+      { status: 200 },
     );
   }
-  return NextResponse.json({
-    message: "Operation unauthorized",
-  }, { status: 401 })
+  return NextResponse.json(
+    {
+      message: "Operation unauthorized",
+    },
+    { status: 401 },
+  );
 }

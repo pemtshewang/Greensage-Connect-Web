@@ -2,7 +2,6 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema } from "@/lib/validations/auth";
-import Link from "next/link";
 import { loginSchemaType } from "@/types";
 import { useForm } from "react-hook-form";
 import { useState } from "react";
@@ -10,11 +9,12 @@ import Icons from "../Icons";
 import Image from "next/image";
 import logo from "@/public/images/logo.png";
 import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "../ui/button";
 import { toast } from "sonner";
+import Footer from "../Footer";
+import { useRouter } from "next/navigation";
 
 export default function LoginForm() {
   const {
@@ -22,7 +22,7 @@ export default function LoginForm() {
     handleSubmit,
     formState: { errors },
   } = useForm<loginSchemaType>({ resolver: zodResolver(loginSchema) });
-  const router = useRouter()
+  const router = useRouter();
   const handleSubmittedData = async (data: loginSchemaType) => {
     setLoading(true);
     const result = await signIn("credentials", {
@@ -40,11 +40,8 @@ export default function LoginForm() {
   };
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
-
   return (
-    <form
-      onSubmit={handleSubmit(handleSubmittedData)}
-    >
+    <form onSubmit={handleSubmit(handleSubmittedData)}>
       <div className="flex-col justify-center items-center p-8 rounded-lg lg:min-w-[400px]">
         <div className="w-fit mx-auto">
           <Image className="w-56 h-56" src={logo} alt="logo" />
@@ -91,37 +88,27 @@ export default function LoginForm() {
               </Button>
             </div>
             <p className="text-red-600 h-5">
-              {errors.password ? errors.password.message : ""}
-            </p>
+              {errors.password ? errors.password.message : ""} </p>
           </div>
         </div>
         <div className="w-fit mx-auto mt-5">
           <Button
-            className="bg-green-600 p-3 rounded-btn"
+            className="bg-green-600 rounded-btn hover:bg-green-700"
             disabled={loading}
           >
             {loading ? (
               <span className="flex gap-1 justify-center ">
                 <Icons.spinner className="animate-spin w-5 h-5" />
-                <Label className="text-muted-foreground align-middle">Signing In</Label>
+                <Label className="text-muted flex items-center">
+                  Signing In
+                </Label>
               </span>
             ) : (
-              <span>
-                <Label className="text-black">Login</Label>
-              </span>
+              <>Login</>
             )}
           </Button>
         </div>
-        <div className="w-full flex">
-          <div className="w-1/2 bg-black dark:bg-muted h-px my-auto"></div>
-          <p className="p-2">OR</p>
-          <div className="w-1/2 bg-black dark:bg-muted h-px my-auto"></div>
-        </div>
-        <div className="w-full flex justify-center">
-          <Link className="link text-blue-500" href="/auth/signup">
-            Don&apos;t have any account? Sign up
-          </Link>
-        </div>
+        <Footer className="flex justify-center mt-5 space-x-1" />
       </div>
     </form>
   );

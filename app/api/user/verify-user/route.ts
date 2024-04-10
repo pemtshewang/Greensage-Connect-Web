@@ -8,14 +8,15 @@ export async function PATCH(req: NextRequest) {
   expirationDate.setMonth(expirationDate.getMonth() + 1);
   const otp = await db.user.findUnique({
     where: {
-      id: id
+      id: id,
     },
     select: {
       otp: true,
-      otpExpiresAt: true
-    }
+      otpExpiresAt: true,
+    },
   });
-  const verified = (otp?.otp === code && otp?.otpExpiresAt as Date >= new Date());
+  const verified =
+    otp?.otp === code && (otp?.otpExpiresAt as Date) >= new Date();
   if (verified) {
     await db.user.update({
       where: {
@@ -32,20 +33,23 @@ export async function PATCH(req: NextRequest) {
         expiresAt: expirationDate.toISOString(), // Set the expiration timestamp
       },
     });
-    return NextResponse.json({
-      message: "Account Verification Successful"
-    }, {
-      status: 200
-    });
+    return NextResponse.json(
+      {
+        message: "Account Verification Successful",
+      },
+      {
+        status: 200,
+      },
+    );
   }
   return NextResponse.json(
     {
       message: "There was an error while verifying the user",
     },
-    { status: 500 }
+    { status: 500 },
   );
 }
 
 function generateAccessToken() {
-  return crypto.randomUUID()
+  return crypto.randomUUID();
 }

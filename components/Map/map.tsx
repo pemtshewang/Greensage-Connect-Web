@@ -1,10 +1,10 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
-import 'leaflet/dist/leaflet.css';
+import React, { useState, useEffect } from "react";
+import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import "leaflet/dist/leaflet.css";
 import { icon } from "leaflet";
-import Icons from '../Icons';
+import Icons from "../Icons";
 import { format } from "date-fns";
 
 const Icon = icon({
@@ -21,10 +21,13 @@ interface MapUserType {
 }
 
 const getUserWithCoordinates = async () => {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/map/finder`, {
-    cache: "no-store",
-    method: "GET"
-  });
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_BASE_URL}/api/map/finder`,
+    {
+      cache: "no-store",
+      method: "GET",
+    },
+  );
   const result = await res.json();
   return result;
 };
@@ -34,7 +37,7 @@ const Map = () => {
   const [fetching, setFetching] = useState<boolean>(true);
 
   useEffect(() => {
-    getUserWithCoordinates().then(res => {
+    getUserWithCoordinates().then((res) => {
       setCoordinatesList(res);
       setFetching(false);
     });
@@ -50,18 +53,33 @@ const Map = () => {
           </h2>
         </div>
       ) : coordinatesList.length ? (
-        <MapContainer center={[27.5142, 90.4336]} zoom={9} preferCanvas={true} style={{ width: '100%', height: '600px' }}>
+        <MapContainer
+          center={[27.5142, 90.4336]}
+          zoom={9}
+          preferCanvas={true}
+          style={{ width: "100%", height: "600px" }}
+        >
           <TileLayer
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           />
           {coordinatesList.map((user, index) => (
-            <Marker key={index} position={[parseFloat(user.posLat), parseFloat(user.posLong)]} icon={Icon}>
+            <Marker
+              key={index}
+              position={[parseFloat(user.posLat), parseFloat(user.posLong)]}
+              icon={Icon}
+            >
               <Popup>
                 <div>
                   <p>Dzongkhag: {user.dzongkhag}</p>
                   <p>Gewog: {user.gewog}</p>
-                  <p>Registered At: {format(new Date(user.registeredAt.toString()), "EEEE, do MMM yyyy hh:mm aa")}</p>
+                  <p>
+                    Registered At:{" "}
+                    {format(
+                      new Date(user.registeredAt.toString()),
+                      "EEEE, do MMM yyyy hh:mm aa",
+                    )}
+                  </p>
                 </div>
               </Popup>
             </Marker>
@@ -78,4 +96,3 @@ const Map = () => {
 };
 
 export default Map;
-

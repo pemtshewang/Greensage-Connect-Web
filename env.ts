@@ -1,0 +1,37 @@
+import { createEnv } from "@t3-oss/env-core";
+import { z } from "zod";
+
+export const env = createEnv({
+  server: {
+    DATABASE_URL: z.string().url(),
+    GEOCOD_API_KEY: z.string().min(5),
+    NEXTAUTH_URL: z.string().url(),
+    NEXTAUTH_SECRET: z.string(),
+    NEXTAUTH_URL_INTERNAL: z.string().url(),
+    NODE_ENV: z.enum(["development", "test", "production"]),
+    GRAPHANA_TOKEN: z.string(),
+    TWILIO_ACCOUNT_SID: z.string(),
+    TWILIO_AUTH_TOKEN: z.string(),
+    HTTP_SMS_API_KEY: z.string(),
+  },
+  clientPrefix: "NEXT_PUBLIC",
+  client: {
+    NEXT_PUBLIC_BASE_URL: z.string().url(),
+    NEXT_PUBLIC_GRAPHANA_DASHBOARD_URL: z.string().url(),
+  },
+  runtimeEnv: {
+    DATABASE_URL: process.env.DATABASE_URL,
+    GEOCOD_API_KEY: process.env.GEOCOD_API_KEY,
+    NEXT_PUBLIC_BASE_URL: process.env.NEXT_PUBLIC_BASE_URL,
+    NEXTAUTH_URL: process.env.NEXTAUTH_URL,
+    NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,
+    NEXTAUTH_URL_INTERNAL: process.env.NEXTAUTH_URL_INTERNAL,
+    NODE_ENV: process.env.NODE_ENV,
+    GRAPHANA_TOKEN: process.env.GRAPHANA_TOKEN,
+    NEXT_PUBLIC_GRAPHANA_DASHBOARD_URL:
+      process.env.NEXT_PUBLIC_GRAPHANA_DASHBOARD_URL,
+    TWILIO_ACCOUNT_SID: process.env.TWILIO_ACCOUNT_SID,
+    TWILIO_AUTH_TOKEN: process.env.TWILIO_AUTH_TOKEN,
+    HTTP_SMS_API_KEY: process.env.HTTP_SMS_API_KEY,
+  },
+});

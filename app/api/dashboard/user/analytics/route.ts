@@ -4,11 +4,11 @@ import { getUser } from "@/lib/session";
 
 export async function GET(request: NextRequest) {
   const user = await getUser();
-  const id = request.nextUrl.searchParams.get('id');
+  const id = request.nextUrl.searchParams.get("id");
   if (user) {
     const userData = await db.user.findUnique({
       where: {
-        id: id as string
+        id: id as string,
       },
       select: {
         controllers: {
@@ -17,26 +17,26 @@ export async function GET(request: NextRequest) {
               select: {
                 startTime: true,
                 endTime: true,
-                repetitionDays: true
-              }
+                repetitionDays: true,
+              },
             },
             HumidityThresholdRecord: {
               select: {
                 value: true,
-                recordedAt: true
-              }
+                recordedAt: true,
+              },
             },
             TemperatureThresholdRecord: {
               select: {
                 value: true,
-                recordedAt: true
-              }
+                recordedAt: true,
+              },
             },
             soilMoistureThresholdRecords: {
               select: {
                 value: true,
-                recordedAt: true
-              }
+                recordedAt: true,
+              },
             },
             readings: {
               select: {
@@ -45,12 +45,12 @@ export async function GET(request: NextRequest) {
                 temperature: true,
                 soilMoisture: true,
                 humidity: true,
-              }
+              },
             },
-          }
-        }
-      }
-    })
+          },
+        },
+      },
+    });
 
     const combinedData: {
       readings: {
@@ -82,17 +82,29 @@ export async function GET(request: NextRequest) {
       waterScheduleRecords: [],
       HumidityThresholdRecord: [],
       TemperatureThresholdRecord: [],
-      soilMoistureThresholdRecords: []
+      soilMoistureThresholdRecords: [],
     };
 
-    userData?.controllers.forEach(controller => {
+    userData?.controllers.forEach((controller) => {
       combinedData.readings = combinedData.readings.concat(controller.readings);
-      combinedData.waterScheduleRecords = combinedData.waterScheduleRecords.concat(controller.waterScheduleRecords);
-      combinedData.HumidityThresholdRecord = combinedData.HumidityThresholdRecord.concat(controller.HumidityThresholdRecord);
-      combinedData.TemperatureThresholdRecord = combinedData.TemperatureThresholdRecord.concat(controller.TemperatureThresholdRecord);
-      combinedData.soilMoistureThresholdRecords = combinedData.soilMoistureThresholdRecords.concat(controller.soilMoistureThresholdRecords);
+      combinedData.waterScheduleRecords =
+        combinedData.waterScheduleRecords.concat(
+          controller.waterScheduleRecords,
+        );
+      combinedData.HumidityThresholdRecord =
+        combinedData.HumidityThresholdRecord.concat(
+          controller.HumidityThresholdRecord,
+        );
+      combinedData.TemperatureThresholdRecord =
+        combinedData.TemperatureThresholdRecord.concat(
+          controller.TemperatureThresholdRecord,
+        );
+      combinedData.soilMoistureThresholdRecords =
+        combinedData.soilMoistureThresholdRecords.concat(
+          controller.soilMoistureThresholdRecords,
+        );
     });
     return NextResponse.json(combinedData);
   }
-  return NextResponse.json({ message: "Not Authorized" }, { status: 401 })
+  return NextResponse.json({ message: "Not Authorized" }, { status: 401 });
 }
