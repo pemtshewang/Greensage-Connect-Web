@@ -40,7 +40,7 @@ export async function POST(req: Request) {
       if (user) {
         const modifiedUser = {
           ...user,
-          brokerIp: env.EMQX_CONNECT_URL,
+          brokerIp: 8883,
           accessToken: accessToken,
         };
         const userAny = modifiedUser as any;
