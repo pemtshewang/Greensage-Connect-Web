@@ -15,6 +15,7 @@ export const env = createEnv({
     EMQX_APP_ID: z.string(),
     EMQX_APP_SECRET: z.string(),
     EMQX_BASE_URL: z.string(),
+    EMQX_PORT: z.string(),
   },
   clientPrefix: "NEXT_PUBLIC",
   client: {
@@ -34,5 +35,6 @@ export const env = createEnv({
     EMQX_APP_ID: process.env.EMQX_APP_ID,
     EMQX_APP_SECRET: process.env.EMQX_APP_SECRET,
     EMQX_BASE_URL: process.env.EMQX_BASE_URL,
+    EMQX_PORT: process.env.EMQX_PORT,
   },
 });

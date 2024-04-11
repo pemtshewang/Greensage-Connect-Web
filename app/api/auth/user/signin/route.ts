@@ -7,7 +7,7 @@ export async function POST(req: Request) {
 
   const user = await db.user.findUnique({
     where: {
-      username: username
+      username: username,
     },
     select: {
       username: true,
@@ -30,7 +30,10 @@ export async function POST(req: Request) {
       userId: user?.id,
     },
   });
-  const isPasswordCorrect = await checkPassword(password, user?.password as string);
+  const isPasswordCorrect = await checkPassword(
+    password,
+    user?.password as string,
+  );
   if (user?.verifiedAt) {
     delete user["password"];
     delete user["verifiedAt"];
@@ -40,8 +43,7 @@ export async function POST(req: Request) {
         const modifiedUser = {
           ...user,
           accessToken: accessToken,
-        }
-        console.log('user..', modifiedUser)
+        };
         const userAny = modifiedUser as any;
         // Add expiration date one month from the current date
         const expirationDate = new Date();
@@ -55,7 +57,10 @@ export async function POST(req: Request) {
     }
   }
 
-  return NextResponse.json({ message: "Invalid username or password" }, {
-    status: 401,
-  });
+  return NextResponse.json(
+    { message: "Invalid username or password" },
+    {
+      status: 401,
+    },
+  );
 }

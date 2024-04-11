@@ -6,6 +6,7 @@ import { getUser } from "@/lib/session";
 import { generateBrokerId } from "./verify-user/emqx";
 import { getRandomDigits } from "@/utils/otp-generator";
 import { sendUserOTP } from "@/utils/sms-gateway";
+import { env } from "@/env";
 
 interface User {
   username: string;
@@ -22,9 +23,10 @@ interface User {
 }
 export async function POST(req: NextRequest) {
   const form = await req.formData();
+  // takes user name and mobile and generates the unique BROKER ID
   const brokerId = generateBrokerId(
     form.get("username").toString().trim(),
-    form.get("username").toString().trim(),
+    form.get("mobile").toString().trim(),
   );
   const lat = form.get("lat").toString();
   const long = form.get("long").toString();
@@ -37,8 +39,8 @@ export async function POST(req: NextRequest) {
     gewog: form.get("gewog").toString().trim(),
     dzongkhag: form.get("dzongkhag").toString().trim(),
     brokerId: brokerId,
-    brokerIp: "192.168.137.180",
-    brokerPort: 8083,
+    brokerIp: env.EMQX_BASE_URL,
+    brokerPort: Number(env.EMQX_PORT),
   };
 
   if (lat && long) {
@@ -55,7 +57,6 @@ export async function POST(req: NextRequest) {
   });
   // verify if the provided number is valid or not
   const validNumber = await verifyNumber(form.get("mobile").toString());
-  //
   // if given number is valid
   if (validNumber) {
     const otpDigits = getRandomDigits().toString();
