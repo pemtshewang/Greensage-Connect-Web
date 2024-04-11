@@ -35,7 +35,6 @@ export async function POST(req: Request) {
     user?.password as string,
   );
   if (user?.verifiedAt) {
-    delete user["password"];
     delete user["verifiedAt"];
     if (isPasswordCorrect) {
       // Remove password from user object
