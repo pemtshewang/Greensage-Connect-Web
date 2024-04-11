@@ -1,68 +1,75 @@
 "use client";
 import { useEffect, useState } from "react";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-} from "@/components/ui/card"
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import Icons from "../Icons";
 import { Skeleton } from "../ui/skeleton";
 import { format } from "date-fns";
 
 const getUsersJoinedCount = async () => {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/dashboard/user/count`, {
-    method: "GET",
-    cache: "no-store"
-  });
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_BASE_URL}/api/dashboard/user/count`,
+    {
+      method: "GET",
+      cache: "no-store",
+      next: {
+        revalidate: 5,
+      },
+    },
+  );
   const count = await res.json();
   return count;
-}
+};
 const getUsersRecentJoinedList = async () => {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/dashboard/users`, {
-    method: "GET",
-    cache: "no-store"
-  });
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_BASE_URL}/api/dashboard/users`,
+    {
+      method: "GET",
+      cache: "no-store",
+      next: {
+        revalidate: 5,
+      },
+    },
+  );
   const list = await res.json();
   return list;
-}
+};
 
 const getUsersOnlineCount = async () => {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/dashboard/users/emqx-connected-users`, {
-    method: "GET",
-    cache: "no-store",
-  });
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_BASE_URL}/api/dashboard/users/emqx-connected-users`,
+    {
+      method: "GET",
+      cache: "no-store",
+    },
+  );
   const count = await res.json();
   return count;
-}
+};
 
 export const UsersJoinedCard = () => {
   const [usersCount, setUsersCount] = useState<number>();
   const [loading, setLoading] = useState<boolean>(true);
-  console.log(usersCount);
   useEffect(() => {
     getUsersJoinedCount().then((res) => {
       setUsersCount(res);
       setLoading(false);
-    })
-  }, [usersCount])
+    });
+  }, [usersCount]);
   return (
     <Card className="w-[200px] h-24 relative">
       <CardHeader className="p-3 font-semibold">Users Joined</CardHeader>
       <CardContent className="p-12">
-        {
-          loading ? (
-            <Skeleton className="rounded-full w-[20px] h-[20px] absolute bottom-0 right-0 p-4 m-3 dark:bg-muted bg-gray-400" />
-          ) : (
-            <h3 className="font-bold absolute bottom-0 right-0 text-3xl font-mono m-2">
-              {usersCount}
-            </h3>
-          )
-        }
+        {loading ? (
+          <Skeleton className="rounded-full w-[20px] h-[20px] absolute bottom-0 right-0 p-4 m-3 dark:bg-muted bg-gray-400" />
+        ) : (
+          <h3 className="font-bold absolute bottom-0 right-0 text-3xl font-mono m-2">
+            {usersCount}
+          </h3>
+        )}
       </CardContent>
     </Card>
-  )
-}
-
+  );
+};
 
 export const UsersOnlineCard = () => {
   const [usersOnlineCount, setUsersOnlineCount] = useState<number>();
@@ -71,23 +78,23 @@ export const UsersOnlineCard = () => {
     getUsersOnlineCount().then((count) => {
       setUsersOnlineCount(count);
       setLoading(false);
-    })
-  }, [usersOnlineCount])
+    });
+  }, [usersOnlineCount]);
   return (
     <Card className="w-[200px] h-24  relative">
       <CardHeader className="p-3 font-semibold">Users Online</CardHeader>
       <CardContent className="p-3 ">
-        {
-          loading ? (
-            <Skeleton className="rounded-full w-[20px] h-[20px] absolute bottom-0 right-0 p-4 m-3 dark:bg-muted bg-gray-400" />
-          ) : (
-            <h3 className="font-bold absolute bottom-0 right-0 text-3xl font-mono m-2">{usersOnlineCount}</h3>
-          )
-        }
+        {loading ? (
+          <Skeleton className="rounded-full w-[20px] h-[20px] absolute bottom-0 right-0 p-4 m-3 dark:bg-muted bg-gray-400" />
+        ) : (
+          <h3 className="font-bold absolute bottom-0 right-0 text-3xl font-mono m-2">
+            {usersOnlineCount}
+          </h3>
+        )}
       </CardContent>
     </Card>
-  )
-}
+  );
+};
 
 const UsersRecentJoinedCardSkeleton = () => {
   return (
@@ -104,18 +111,18 @@ const UsersRecentJoinedCardSkeleton = () => {
         <Skeleton className="h-4 w-[150px]" />
       </span>
     </div>
-  )
-}
+  );
+};
 const UserRecentJoinedCard = ({
   name,
   gewog,
   dzongkhag,
-  date
+  date,
 }: {
-  name: string
-  gewog: string
-  dzongkhag: string
-  date: string
+  name: string;
+  gewog: string;
+  dzongkhag: string;
+  date: string;
 }) => {
   return (
     <div className=" flex border border-muted rounded-sm p-3">
@@ -124,15 +131,17 @@ const UserRecentJoinedCard = ({
       </span>
       <span className="flex-col">
         <h4>{name}</h4>
-        <p className="prose">{gewog},{dzongkhag}</p>
+        <p className="prose">
+          {gewog},{dzongkhag}
+        </p>
       </span>
       <span className="w-fit ml-auto">
         <p className="prose">Joined on</p>
         <p>{format(new Date(date), "EEE, do MMM yyyy hh:mm aa")}</p>
       </span>
     </div>
-  )
-}
+  );
+};
 interface IUserRecentJoined {
   username: string;
   registeredAt: string;
@@ -143,12 +152,14 @@ export const RecentlyJoinedList = () => {
   const [users, setUsers] = useState<IUserRecentJoined[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   useEffect(() => {
-    getUsersRecentJoinedList().then((data) => {
-      setUsers(data);
-      setLoading(false);
-    }).catch((err) => {
-      console.error(err);
-    })
+    getUsersRecentJoinedList()
+      .then((data) => {
+        setUsers(data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
   }, []);
   return (
     <Card className="container min-h-[30vh] pb-3 ">
@@ -160,33 +171,32 @@ export const RecentlyJoinedList = () => {
       </CardHeader>
       <CardContent className="p-3">
         <div className="flex-col justify-center space-y-2">
-          {
-            loading ? (
-              <>
-                <UsersRecentJoinedCardSkeleton />
-                <UsersRecentJoinedCardSkeleton />
-                <UsersRecentJoinedCardSkeleton />
-              </>
-            ) : users.length > 0 ? (
-              users.map((item) => (
-                <UserRecentJoinedCard
-                  key={item.username}
-                  date={item?.registeredAt as string}
-                  name={item?.username as string}
-                  gewog={item?.gewog as string}
-                  dzongkhag={item?.dzongkhag as string}
-                />
-              ))
-            ) : (
-              <>
-                <Icons.emptyUsers className="w-8 h-8 mx-auto" />
-                <p className="text-muted-foreground text-center">No users have registered yet! You may invite them</p>
-              </>
-            )
-          }
+          {loading ? (
+            <>
+              <UsersRecentJoinedCardSkeleton />
+              <UsersRecentJoinedCardSkeleton />
+              <UsersRecentJoinedCardSkeleton />
+            </>
+          ) : users.length > 0 ? (
+            users.map((item) => (
+              <UserRecentJoinedCard
+                key={item.username}
+                date={item?.registeredAt as string}
+                name={item?.username as string}
+                gewog={item?.gewog as string}
+                dzongkhag={item?.dzongkhag as string}
+              />
+            ))
+          ) : (
+            <>
+              <Icons.emptyUsers className="w-8 h-8 mx-auto" />
+              <p className="text-muted-foreground text-center">
+                No users have registered yet! You may invite them
+              </p>
+            </>
+          )}
         </div>
       </CardContent>
     </Card>
-  )
-}
-
+  );
+};
