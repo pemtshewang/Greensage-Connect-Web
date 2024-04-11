@@ -40,7 +40,8 @@ export async function POST(req: NextRequest) {
     dzongkhag: form.get("dzongkhag").toString().trim(),
     brokerId: brokerId,
     brokerIp: env.EMQX_BASE_URL,
-    brokerPort: Number(env.EMQX_PORT),
+    // brokerPort: Number(env.EMQX_PORT),
+    brokerPort: 8883,
   };
 
   if (lat && long) {
