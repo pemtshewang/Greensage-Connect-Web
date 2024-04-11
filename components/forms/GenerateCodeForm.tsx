@@ -42,7 +42,7 @@ const FormSchema = z.object({
   brokerUrl: z.string().min(1),
   brokerPort: z.number(),
   brokerUsername: z.string().min(1),
-  brokerPassword: z
+  password: z
     .string()
     .min(8, { message: "The password should be min of 8 characters" }),
   controllerBrokerId: z.string().min(1),
@@ -128,6 +128,7 @@ interface UserDetail {
   brokerPort: number;
   brokerIp: string;
   brokerId: string;
+  password: string;
   username: string;
 }
 export default function GenerateCodeForm({ id }: { id: string }) {
@@ -165,6 +166,7 @@ export default function GenerateCodeForm({ id }: { id: string }) {
         form.setValue("controllerBrokerId", controllerId);
         form.setValue("userBrokerId", res?.brokerId);
         form.setValue("brokerUrl", res?.brokerIp);
+        form.setValue("password", res?.password);
         form.setValue("brokerPort", res?.brokerPort);
         form.setValue("brokerUsername", res?.username);
         setFormLoading(false);
@@ -359,7 +361,8 @@ export default function GenerateCodeForm({ id }: { id: string }) {
                   />
                   <FormField
                     control={form.control}
-                    name="brokerPassword"
+                    name="password"
+                    defaultValue={userDetail?.password}
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Enter the user broker password</FormLabel>
