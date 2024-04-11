@@ -46,7 +46,6 @@ export async function POST(req: NextRequest) {
   if (lat && long) {
     trimmedUser.posLat = lat;
     trimmedUser.posLong = long;
-    console.log(trimmedUser);
   }
   const hashedPassword = await hashPassword(form.get("password").toString());
   const user = await db.user.create({
