@@ -13,7 +13,6 @@ const getConnectedUsers = async () => {
     next: {
       revalidate: 5,
     },
-    cache: "no-store",
   });
   const result = await res.json();
   return result?.meta?.count;
