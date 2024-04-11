@@ -40,6 +40,9 @@ const getUsersOnlineCount = async () => {
     {
       method: "GET",
       cache: "no-store",
+      next: {
+        revalidate: 5,
+      },
     },
   );
   const count = await res.json();

@@ -10,6 +10,9 @@ const getConnectedUsers = async () => {
       Authorization:
         "Basic " + btoa(`${env.EMQX_APP_ID}:${env.EMQX_APP_SECRET}`),
     },
+    next: {
+      revalidate: 5,
+    },
     cache: "no-store",
   });
   const result = await res.json();
