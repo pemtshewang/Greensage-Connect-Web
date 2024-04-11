@@ -9,15 +9,16 @@ export const env = createEnv({
     NEXTAUTH_SECRET: z.string(),
     NEXTAUTH_URL_INTERNAL: z.string().url(),
     NODE_ENV: z.enum(["development", "test", "production"]),
-    // GRAPHANA_TOKEN: z.string(),
     TWILIO_ACCOUNT_SID: z.string(),
     TWILIO_AUTH_TOKEN: z.string(),
     HTTP_SMS_API_KEY: z.string(),
+    EMQX_APP_ID: z.string(),
+    EMQX_APP_SECRET: z.string(),
+    EMQX_BASE_URL: z.string(),
   },
   clientPrefix: "NEXT_PUBLIC",
   client: {
     NEXT_PUBLIC_BASE_URL: z.string().url(),
-    // NEXT_PUBLIC_GRAPHANA_DASHBOARD_URL: z.string().url(),
   },
   runtimeEnv: {
     DATABASE_URL: process.env.DATABASE_URL,
@@ -27,11 +28,11 @@ export const env = createEnv({
     NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,
     NEXTAUTH_URL_INTERNAL: process.env.NEXTAUTH_URL_INTERNAL,
     NODE_ENV: process.env.NODE_ENV,
-    // GRAPHANA_TOKEN: process.env.GRAPHANA_TOKEN,
-    // NEXT_PUBLIC_GRAPHANA_DASHBOARD_URL:
-    // process.env.NEXT_PUBLIC_GRAPHANA_DASHBOARD_URL,
     TWILIO_ACCOUNT_SID: process.env.TWILIO_ACCOUNT_SID,
     TWILIO_AUTH_TOKEN: process.env.TWILIO_AUTH_TOKEN,
     HTTP_SMS_API_KEY: process.env.HTTP_SMS_API_KEY,
+    EMQX_APP_ID: process.env.EMQX_APP_ID,
+    EMQX_APP_SECRET: process.env.EMQX_APP_SECRET,
+    EMQX_BASE_URL: process.env.EMQX_BASE_URL,
   },
 });
