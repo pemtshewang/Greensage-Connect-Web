@@ -1,6 +1,7 @@
 import { checkPassword } from "@/utils/bcryptMgr";
 import { db } from "@/lib/db";
 import { NextResponse } from "next/server";
+import { env } from "@/env";
 
 export async function POST(req: Request) {
   const { username, password } = await req.json();
@@ -19,7 +20,6 @@ export async function POST(req: Request) {
       irrigationCount: true,
       cid: true,
       brokerId: true,
-      brokerIp: true,
       password: true,
       brokerPort: true,
       verifiedAt: true,
@@ -37,10 +37,10 @@ export async function POST(req: Request) {
   if (user?.verifiedAt) {
     delete user["verifiedAt"];
     if (isPasswordCorrect) {
-      // Remove password from user object
       if (user) {
         const modifiedUser = {
           ...user,
+          brokerIp: env.EMQX_CONNECT_URL,
           accessToken: accessToken,
         };
         const userAny = modifiedUser as any;
