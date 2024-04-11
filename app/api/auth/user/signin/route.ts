@@ -44,10 +44,8 @@ export async function POST(req: Request) {
           accessToken: accessToken,
         };
         const userAny = modifiedUser as any;
-        // Add expiration date one month from the current date
         const expirationDate = new Date();
         expirationDate.setMonth(expirationDate.getMonth() + 1);
-
         userAny.expirationDate = expirationDate.toISOString();
         return NextResponse.json(userAny, {
           status: 200,
