@@ -7,7 +7,6 @@ import {
   ContextMenuTrigger,
   ContextMenu,
   ContextMenuContent,
-  ContextMenuItem,
 } from "@radix-ui/react-context-menu";
 import Icons from "./Icons";
 import { toast } from "sonner";
@@ -17,7 +16,7 @@ import { env } from "@/env";
 
 async function DeleteNewsFeed(id: string) {
   const res = await fetch(
-    `${env.NEXT_PUBLIC_BASE_URL}/api/newsfeed/admin/?id=${id}`,
+    `${env.NEXT_PUBLIC_BASE_URL}/api/feeds/admin/?id=${id}`,
     {
       method: "DELETE",
       cache: "no-store",
