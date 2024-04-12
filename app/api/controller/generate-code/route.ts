@@ -72,7 +72,7 @@ function generateCode(credentials: {
     /**
      * @brief Reset pin for the OLED display (-1 means no reset pin).
      */
-    #define OLED_RESET - 1
+    #define OLED_RESET -1
 
     /**
      * @brief I2C address of the OLED display.
@@ -95,17 +95,17 @@ function generateCode(credentials: {
     /**
      * @brief URL or IP address of the MQTT broker.
      */
-    const char * mqtt_server = "${credentials.brokerUrl}";
+    const char *mqtt_server = "${credentials.brokerUrl}";
 
     /**
      * @brief Username for authenticating with the MQTT broker.
      */
-    const char * mqtt_username = "${credentials.brokerUsername}";
+    const char *mqtt_username = "${credentials.brokerUsername}";
 
     /**
      * @brief Password for authenticating with the MQTT broker.
      */
-    const char * mqtt_password = "${credentials.password}";
+    String mqtt_password = "${credentials.password}";
 
     /**
      * @brief Port number for the MQTT broker (default is 8883).
@@ -128,7 +128,7 @@ function generateCode(credentials: {
     unsigned long lastMqttPublishTime = 0;
 
     // EMQX serverless deployment certificate
-    const char *ca_cert = R"EOF(
+    const char* ca_cert = R"EOF(
     -----BEGIN CERTIFICATE-----
     MIIDrzCCApegAwIBAgIQCDvgVpBCRrGhdWrJWZHHSjANBgkqhkiG9w0BAQUFADBh
     MQswCQYDVQQGEwJVUzEVMBMGA1UEChMMRGlnaUNlcnQgSW5jMRkwFwYDVQQLExB3
@@ -578,7 +578,7 @@ function generateCode(credentials: {
         Serial.print("Attempting MQTT connection… ");
         String clientId = "ESP32Client";
         // Attempt to connect
-        if (mqtt_client.connect(clientId.c_str(), mqtt_username, mqtt_password)) {
+        if (mqtt_client.connect(clientId.c_str(), mqtt_username, mqtt_password.c_str())) {
           display.println();
           display.println("Connected to MQTT");
           display.display();
@@ -767,7 +767,7 @@ function generateCode(credentials: {
         } else {
           Serial.println("Failed to read from BME sensor!");
         }
-      }
-    } 
+    }
+  } 
 `;
 }

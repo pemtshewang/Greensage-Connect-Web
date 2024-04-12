@@ -23,7 +23,6 @@ interface User {
 }
 export async function POST(req: NextRequest) {
   const form = await req.formData();
-  // takes user name and mobile and generates the unique BROKER ID
   const brokerId = generateBrokerId(
     form.get("username").toString().trim(),
     form.get("mobile").toString().trim(),
@@ -40,8 +39,7 @@ export async function POST(req: NextRequest) {
     dzongkhag: form.get("dzongkhag").toString().trim(),
     brokerId: brokerId,
     brokerIp: env.EMQX_BASE_URL,
-    // brokerPort: Number(env.EMQX_PORT),
-    brokerPort: 8883,
+    brokerPort: Number(env.EMQX_PORT),
   };
 
   if (lat && long) {
