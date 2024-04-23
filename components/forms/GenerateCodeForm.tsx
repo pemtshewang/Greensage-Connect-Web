@@ -35,6 +35,7 @@ import {
 import Icons from "../Icons";
 import { Input } from "../ui/input";
 import downloadCode from "@/utils/download";
+import Credentials from "next-auth/providers/credentials";
 
 const FormSchema = z.object({
   ap: z.string().min(1),
@@ -51,6 +52,7 @@ const FormSchema = z.object({
   wifiPassword: z
     .string()
     .min(8, { message: "The password should be min of 8 characters" }),
+  type: z.string().optional(),
 });
 
 const getIrrigationControllers = async (id: string) => {
@@ -80,6 +82,8 @@ const getGreenhouseControllers = async (id: string) => {
   const controllers = res.json();
   return controllers;
 };
+
+//auto exec
 const getUserDetail = async (id: string) => {
   const res = await fetch(
     `${process.env.NEXT_PUBLIC_BASE_URL}/api/controller/generate-code/user-config`,
@@ -93,6 +97,7 @@ const getUserDetail = async (id: string) => {
   const detail = res.json();
   return detail;
 };
+
 const handleCopyToClipboard = async (content: string) => {
   try {
     await copyToClipboard(content);
@@ -175,6 +180,7 @@ export default function GenerateCodeForm({ id }: { id: string }) {
   }, [controllerId, id, form]);
   function onSubmit(data: z.infer<typeof FormSchema>) {
     setRecievingCode(true);
+    data.type = type;
     generateCode(data).then((res) => {
       setControllerCode(res);
       setRecievingCode(false);
@@ -272,12 +278,18 @@ export default function GenerateCodeForm({ id }: { id: string }) {
                     <SelectContent>
                       {type === "greenhouse"
                         ? greenhouseControllers.map((controller) => (
-                          <SelectItem key={controller.controllerId} value={controller.controllerId}>
+                          <SelectItem
+                            key={controller.controllerId}
+                            value={controller.controllerId}
+                          >
                             {controller.name} : {controller.controllerId}
                           </SelectItem>
                         ))
                         : irrigationControllers.map((controller) => (
-                          <SelectItem value={controller.controllerId} key={controller.controllerId}>
+                          <SelectItem
+                            value={controller.controllerId}
+                            key={controller.controllerId}
+                          >
                             {controller.name} : {controller.controllerId}
                           </SelectItem>
                         ))}
@@ -405,7 +417,9 @@ export default function GenerateCodeForm({ id }: { id: string }) {
                             defaultValue={1883}
                             type="number"
                             className="max-w-sm"
-                            {...form.register('brokerPort', { valueAsNumber: true })}
+                            {...form.register("brokerPort", {
+                              valueAsNumber: true,
+                            })}
                           />
                         </FormControl>
                         <FormDescription>
