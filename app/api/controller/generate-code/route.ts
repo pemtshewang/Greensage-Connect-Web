@@ -8,7 +8,10 @@ export async function POST(request: NextRequest) {
   const credentials = await request.json();
 
   if (user) {
-    const code = credentials.type === "greenhouse" ? generateGreenhouseCode(credentials) ? generateIrrigationCode(credentials);
+    const code =
+      credentials.type === "greenhouse"
+        ? generateGreenhouseCode(credentials)
+        : generateIrrigationCode(credentials);
     return NextResponse.json(code);
   }
   return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
