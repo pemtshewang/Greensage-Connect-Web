@@ -7,7 +7,6 @@ import {
   PaginationContent,
   PaginationItem,
   PaginationPrevious,
-  PaginationEllipsis,
   PaginationNext,
 } from "./ui/pagination";
 import Link from "next/link";
@@ -46,7 +45,7 @@ const PaginatedNewsFeed = ({ newsFeeds }: { newsFeeds: NewsFeedType[] }) => {
             createdAt={newsFeed.createdAt}
           />
         ))}
-      <Pagination className="py-5">
+      <Pagination className="">
         <PaginationContent>
           <PaginationItem>
             <PaginationPrevious
@@ -60,11 +59,14 @@ const PaginatedNewsFeed = ({ newsFeeds }: { newsFeeds: NewsFeedType[] }) => {
             />
           </PaginationItem>
           {Array.from({ length: totalPages }, (_, index) => (
-            <PaginationItem className={`mx-3 ${cn(buttonVariants(
-              {
-                variant: "default"
-              }
-            ))}`} key={index + 1}>
+            <PaginationItem
+              className={`mx-3 ${cn(
+                buttonVariants({
+                  variant: "default",
+                }),
+              )}`}
+              key={index + 1}
+            >
               <PaginationLink
                 href="#"
                 onClick={() => handlePageChange(index + 1)}

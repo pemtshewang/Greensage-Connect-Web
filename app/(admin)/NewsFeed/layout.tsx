@@ -1,11 +1,13 @@
-"use client"
+"use client";
 
-import ButtonGroup from "@/components/NewsFeedBtnGrp"
-import NewsFeedContext from "@/context/newsFeedContext"
-import { useState } from "react"
+import ButtonGroup from "@/components/NewsFeedBtnGrp";
+import NewsFeedContext from "@/context/newsFeedContext";
+import { useState } from "react";
 
-export default function NewsFeedLayout({ children }: {
-  children: React.ReactNode
+export default function NewsFeedLayout({
+  children,
+}: {
+  children: React.ReactNode;
 }) {
   const [isChanged, setIsChanged] = useState<boolean>(false);
   return (
@@ -13,5 +15,5 @@ export default function NewsFeedLayout({ children }: {
       <ButtonGroup />
       {children}
     </NewsFeedContext.Provider>
-  )
+  );
 }
