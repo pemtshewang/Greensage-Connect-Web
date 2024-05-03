@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import {
   AlertDialog,
@@ -12,7 +12,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 
-const DeleteThresholdDialog = () => {
+const DeleteThresholdDialog = ({ id }: { id: string }) => {
   return (
     <AlertDialog>
       <AlertDialogTrigger>Delete</AlertDialogTrigger>
@@ -20,7 +20,8 @@ const DeleteThresholdDialog = () => {
         <AlertDialogHeader>
           <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
           <AlertDialogDescription>
-            This action cannot be undone. This will permanently delete the threshold paramter from the list
+            This action cannot be undone. This will permanently delete the
+            threshold paramter from the list
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
