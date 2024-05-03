@@ -41,6 +41,12 @@ export default function Sidebar() {
             </Link>
           </SheetCloseWrapper>
           <SheetCloseWrapper {...shetCloseWrapperProps}>
+            <Link href="/crops/parameters" className="flex justify-between prose no-underline hover:underline">
+              Manage Threshold Parameters
+              <Icons.thermometer />
+            </Link>
+          </SheetCloseWrapper>
+          <SheetCloseWrapper {...shetCloseWrapperProps}>
             <Link href="/users" className="flex justify-between prose no-underline hover:underline">
               Manage Users
               <Icons.usersGroup />

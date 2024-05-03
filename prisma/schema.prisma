@@ -95,8 +95,6 @@ model HumidityThresholdRecord {
   value        Float
   controller   Controller @relation(fields: [controllerId], references: [controllerId], onDelete: Cascade, onUpdate: Cascade)
   controllerId String
-  // User         User       @relation(fields: [brokerId], references: [brokerId], onDelete: Cascade, onUpdate: Cascade)
-  // brokerId     String
 }
 
 model TemperatureThresholdRecord {
@@ -105,8 +103,6 @@ model TemperatureThresholdRecord {
   value        Float
   controller   Controller @relation(fields: [controllerId], references: [controllerId], onDelete: Cascade, onUpdate: Cascade)
   controllerId String
-  // User         User       @relation(fields: [brokerId], references: [brokerId], onDelete: Cascade, onUpdate: Cascade)
-  // brokerId     String
 }
 
 model NewsFeeds {
@@ -126,4 +122,19 @@ model AccessToken {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   createdAt DateTime @default(now())
   expiresAt DateTime
+}
+
+enum ThresholdType {
+  soilMoisture
+  temperature
+  humidity
+}
+
+model EnvironmentParameterThreshold {
+  id           String @id @default(auto()) @map("_id") @db.ObjectId
+  name         String
+  minThreshold Float  @default(0.0)
+  maxThreshold Float  @default(0.0)
+  createdAt DateTime @default(now())
+  type ThresholdType
 }

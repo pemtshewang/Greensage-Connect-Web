@@ -1,4 +1,4 @@
-import { BarChart4Icon, BookKeyIcon, CameraIcon, CheckCircleIcon, ChevronRight, CircleUserRoundIcon, ClipboardCopyIcon, Code2Icon, DownloadIcon, EyeIcon, EyeOffIcon, FilePlus2Icon, HelpCircle, InfoIcon, KeyIcon, Loader2Icon, LogOutIcon, MapPin, MoonIcon, NewspaperIcon, PanelLeftCloseIcon, PanelLeftIcon, PanelLeftOpenIcon, PanelRightClose, PencilIcon, SettingsIcon, SunIcon, TargetIcon, TrashIcon, UserCheckIcon, UserRoundIcon, UsersRoundIcon } from "lucide-react";
+import { BarChart4Icon, BookKeyIcon, CameraIcon, CheckCircleIcon, ChevronRight, CircleUserRoundIcon, ClipboardCopyIcon, Code2Icon, DownloadIcon, EyeIcon, EyeOffIcon, FilePlus2Icon, HelpCircle, InfoIcon, KeyIcon, Loader2Icon, LogOutIcon, MapPin, MoonIcon, NewspaperIcon, PanelLeftCloseIcon, PanelLeftIcon, PanelLeftOpenIcon, PanelRightClose, PencilIcon, SettingsIcon, SunIcon, TargetIcon, ThermometerIcon, TrashIcon, UserCheckIcon, UserRoundIcon, UsersRoundIcon } from "lucide-react";
 
 const Icons = {
     eyeOn: EyeIcon,
@@ -173,7 +173,8 @@ const Icons = {
     copyToClipboard: ClipboardCopyIcon,
     downloadIcon: DownloadIcon,
     codeIcon: Code2Icon,
+    thermometer: ThermometerIcon,
 }
 
-export default Icons;
+export default Icons
 
