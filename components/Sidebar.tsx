@@ -52,6 +52,12 @@ export default function Sidebar() {
               <Icons.usersGroup />
             </Link>
           </SheetCloseWrapper>
+          <SheetCloseWrapper {...shetCloseWrapperProps}>
+            <Link href="/settings" className="flex justify-between prose no-underline hover:underline">
+              Settings
+              <Icons.settings />
+            </Link>
+          </SheetCloseWrapper>
           <div className="divider"></div>
           <SheetCloseWrapper {...shetCloseWrapperProps}>
             <Link href="/api/auth/signout" className="flex justify-between prose no-underline hover:underline">

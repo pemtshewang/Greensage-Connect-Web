@@ -13,10 +13,8 @@ async function getData(): Promise<CropThreshold[]> {
     `${env.NEXT_PUBLIC_BASE_URL}/api/resource/threshold?role=admin`,
     {
       method: "GET",
-      next: {
-        revalidate: 5,
-      },
-    }
+      cache: "no-store",
+    },
   );
   const data = (await res.json()) ?? [];
   return data;
@@ -65,7 +63,7 @@ const SkeletonTable = () => (
 
 const getDataFor = (
   data: CropThreshold[],
-  type: "humidity" | "temperature" | "soilmoisture"
+  type: "humidity" | "temperature" | "soilmoisture",
 ) => {
   switch (type) {
     case "humidity":
@@ -82,12 +80,13 @@ export default function CropsThresholdTable() {
   const { value } = useContext(EnvironmentParameterContext);
   const [tableData, setTableData] = useState<CropThreshold[]>([]);
   const [fetching, setFetching] = useState<boolean>(true);
+  const [isTableChange, setIsTableChange] = useState<boolean>(false);
   useEffect(() => {
     getData().then((res) => {
       setData(res);
       setFetching(false);
     });
-  }, []);
+  }, [isTableChange]);
   useEffect(() => {
     setTableData(getDataFor(data, value));
   }, [value, data]);
@@ -96,7 +95,12 @@ export default function CropsThresholdTable() {
       {fetching ? (
         <SkeletonTable />
       ) : (
-        <DataTable columns={columns} data={tableData} />
+        <DataTable
+          columns={columns}
+          data={tableData}
+          isTableChange={isTableChange}
+          setIsTableChange={setIsTableChange}
+        />
       )}
     </div>
   );

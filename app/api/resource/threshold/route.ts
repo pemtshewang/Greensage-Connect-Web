@@ -88,3 +88,52 @@ export async function PATCH(req: Request) {
     },
   );
 }
+
+export async function DELETE(req: Request) {
+  // update function
+  const user = await getUser();
+  const { searchParams } = new URL(req.url);
+  const cropId = searchParams.get("cropId");
+  if (user) {
+    const deletedCrop = await db.environmentParameterThreshold.delete({
+      where: {
+        id: cropId,
+      },
+    });
+    return NextResponse.json(deletedCrop);
+  }
+  return NextResponse.json(
+    {
+      message: "Unauthorized",
+    },
+    {
+      status: 401,
+    },
+  );
+}
+
+export async function POST(req: Request) {
+  const user = await getUser();
+  const { name, type, minThreshold, maxThreshold } = await req.json();
+  console.log(name, type, minThreshold, maxThreshold);
+  if (user) {
+    const addedCrop = await db.environmentParameterThreshold.create({
+      data: {
+        name,
+        type,
+        minThreshold,
+        maxThreshold,
+      },
+    });
+    console.log(addedCrop);
+    return NextResponse.json(addedCrop);
+  }
+  return NextResponse.json(
+    {
+      message: "Unauthorized",
+    },
+    {
+      status: 401,
+    },
+  );
+}

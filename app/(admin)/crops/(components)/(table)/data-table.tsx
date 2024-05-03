@@ -19,16 +19,22 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useState } from "react";
+import { SetStateAction, useState } from "react";
+import { ThresholdParameterDropdown } from "../dropdown-menu";
+import AddCropDialog from "./AddCropDialog";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  isTableChange: boolean;
+  setIsTableChange: React.Dispatch<SetStateAction<boolean>>;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
+  isTableChange,
+  setIsTableChange
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -48,15 +54,21 @@ export function DataTable<TData, TValue>({
 
   return (
     <>
-      <div className="flex items-center py-4">
-        <Input
-          placeholder="Enter crop name to filter..."
-          value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
-          onChange={(event) =>
-            table.getColumn("name")?.setFilterValue(event.target.value)
-          }
-          className="max-w-sm"
-        />
+      <div className="flex justify-between items-center py-4">
+        <div className="flex space-x-5">
+          <Input
+            placeholder="Enter crop name to filter..."
+            value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
+            onChange={(event) =>
+              table.getColumn("name")?.setFilterValue(event.target.value)
+            }
+            className="max-w-sm"
+          />
+          <ThresholdParameterDropdown />
+        </div>
+        <div>
+          <AddCropDialog setIsTableChange={setIsTableChange} />
+        </div>
       </div>
       <div className="rounded-md border">
         <Table>
@@ -69,9 +81,9 @@ export function DataTable<TData, TValue>({
                       {header.isPlaceholder
                         ? null
                         : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
+                          header.column.columnDef.header,
+                          header.getContext(),
+                        )}
                     </TableHead>
                   );
                 })}
@@ -89,7 +101,7 @@ export function DataTable<TData, TValue>({
                     <TableCell key={cell.id}>
                       {flexRender(
                         cell.column.columnDef.cell,
-                        cell.getContext()
+                        cell.getContext(),
                       )}
                     </TableCell>
                   ))}
