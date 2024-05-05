@@ -215,11 +215,10 @@ void setup() {
   pinMode(motorPin, OUTPUT);
   digitalWrite(motorPin, !RELAY_ON);
   
-  WiFi.softAP("${credentials.ap}","${credentials.password}");
-  Serial.println("LocalIp:");
-  Serial.println(WiFi.localIP());
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
+  Serial.println(WiFi.localIP());
+  WiFi.softAP("${credentials.ap}","${credentials.password}");
   espClient.setCACert(ca_cert);
   mqtt_client.setKeepAlive(120);
   mqtt_client.setServer(mqtt_server, mqtt_port);
