@@ -204,6 +204,7 @@ CAUw7C29C79Fv1C5qfPrmAESrciIxpg0X40KPMbp1ZWVbd4=
      * @brief Flag indicating whether the exhaust fan is manually turned on or off.
      */
     bool isFanManuallyOn = false;
+    bool isLightManuallyOn = false;
 
     /**
      * @brief Flag indicating whether the water valve is manually opened or closed.
@@ -379,7 +380,13 @@ CAUw7C29C79Fv1C5qfPrmAESrciIxpg0X40KPMbp1ZWVbd4=
       Serial.println("The topic is: ");
       Serial.println(topic);
       if (topic == "light") {
-        digitalWrite(lightPin, (message == "on") ? RELAY_ON : !RELAY_ON);
+        if(message=="on"){
+          isLightManuallyOn = true;
+          digitalWrite(lightPin,RELAY_ON);
+        }else{
+          isLightManuallyOn = false;
+          digitalWrite(lightPin,!RELAY_ON);
+        }
       } else if (topic == "ventilationFan") {
         Serial.println("Ventilation fan is " + message);
         isFanManuallyOn = message == "on";
@@ -705,7 +712,9 @@ CAUw7C29C79Fv1C5qfPrmAESrciIxpg0X40KPMbp1ZWVbd4=
       int ldrValue = digitalRead(ldrPin);
       
       if (ldrValue == 1) {
-        digitalWrite(lightPin, RELAY_ON); // Turn on the light
+        if(!isLightManuallyOn){
+          digitalWrite(lightPin, RELAY_ON); 
+        }
       } else {
         digitalWrite(lightPin, !RELAY_ON); // Turn off the light
       }
