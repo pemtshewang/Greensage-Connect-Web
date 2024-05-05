@@ -25,8 +25,8 @@ const formSchema = z
     newPassword: z.string().min(8, { message: "Password too short" }),
     confirmPassword: z.string().min(8, { message: "Password too short" }),
   })
-  .superRefine(({ confirmPassword, currentPassword }, ctx) => {
-    if (confirmPassword !== currentPassword) {
+  .superRefine(({ confirmPassword, newPassword }, ctx) => {
+    if (confirmPassword !== newPassword) {
       ctx.addIssue({
         path: ["confirmPassword"],
         code: "custom",
