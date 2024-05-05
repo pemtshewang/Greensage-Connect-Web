@@ -25,12 +25,11 @@ export function generateIrrigationCode(credentials: {
 // Define pins for water valves
 const int waterValvePins[] = {2, 4, 5, 12, 13, 14, 27};
 const int numValves = sizeof(waterValvePins) / sizeof(int);
-
 const int motorPin = 26;  // Pin for controlling the motor (if applicable)
 
 // WiFi and MQTT credentials
 const char* ssid = "${credentials.wifiSSID}";
-const char* password = "${credentials.wifiPassword}";
+const char* password = "${credentials.password}";
 const char* mqtt_server = "${env.EMQX_CONNECT_URL}";
 const char* mqtt_username = "${credentials.brokerUsername}";
 const char* mqtt_password = "${credentials.password}";
@@ -116,24 +115,27 @@ void checkScheduledIrrigations() {
   }
 }
 void handleMqttMessage(char* topic, byte* payload, unsigned int length) {
-  String topicStr = String(topic);
-  String payloadStr = String((char*)payload);
-
+ 
+  String receivedTopic = String(topic);
+  String receivedPayload;
+  for (int i = 0; i < length; i++) {
+    receivedPayload += (char) payload[i];
+  }
   Serial.print("Received MQTT message on topic: ");
   Serial.println(topicStr);
   Serial.print("Payload: ");
-  Serial.println(payloadStr);
+  Serial.println(receivedPayload);
 
   // Handle valve control messages
   if (topicStr.startsWith("user/" + userBrokerId + "/" + controllerBrokerId + "/actuator/valve/")) {
     int valveIndex = topicStr.substring(topicStr.lastIndexOf("/") + 1).toInt();
     if (valveIndex >= 0 && valveIndex < numValves) {
-      if (payloadStr == "open") {
+      if (receivedPayload == "open") {
         Serial.print("Opening valve ");
         Serial.println(valveIndex);
         digitalWrite(motorPin, RELAY_ON);
         digitalWrite(waterValvePins[valveIndex], RELAY_ON);
-      } else if (payloadStr == "close") {
+      } else if (receivedPayload == "close") {
         Serial.print("Closing valve ");
         Serial.println(valveIndex);
         digitalWrite(motorPin, !RELAY_ON);
@@ -148,10 +150,10 @@ void handleMqttMessage(char* topic, byte* payload, unsigned int length) {
   else if (topicStr.startsWith("user/" + userBrokerId + "/" + controllerBrokerId + "/schedule/valve/")) {
     int valveIndex = topicStr.substring(topicStr.lastIndexOf("/") + 1).toInt();
     if (valveIndex >= 0 && valveIndex < numValves) {
-      int delimiterPos1 = payloadStr.indexOf('|');
-      String startTime = payloadStr.substring(delimiterPos1 + 1, payloadStr.lastIndexOf('|'));
-      String endTime = payloadStr.substring(payloadStr.lastIndexOf('|') + 1, payloadStr.lastIndexOf('|', payloadStr.lastIndexOf('|') - 1));
-      String repetitionDaysStr = payloadStr.substring(payloadStr.lastIndexOf('|') + 1);
+      int delimiterPos1 = receivedPayload.indexOf('|');
+      String startTime = receivedPayload.substring(delimiterPos1 + 1, receivedPayload.lastIndexOf('|'));
+      String endTime = receivedPayload.substring(receivedPayload.lastIndexOf('|') + 1, receivedPayload.lastIndexOf('|', receivedPayload.lastIndexOf('|') - 1));
+      String repetitionDaysStr = receivedPayload.substring(receivedPayload.lastIndexOf('|') + 1);
       uint8_t repetitionDayMask = 0;
       for (char c : repetitionDaysStr) {
         repetitionDayMask |= (1 << (c - '0' - 1));
@@ -213,10 +215,10 @@ void setup() {
   pinMode(motorPin, OUTPUT);
   digitalWrite(motorPin, !RELAY_ON);
   
-  WiFi.mode(WIFI_STA);
-  WiFi.softAP("${credentials.ap}", "${credentials.apPassword}");
-  Serial.println("The ip address for access point: ");
+  WiFi.softAP("${credentials.ap}","${credentials.password}");
+  Serial.println("LocalIp:");
   Serial.println(WiFi.localIP());
+  WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
   espClient.setCACert(ca_cert);
   mqtt_client.setKeepAlive(120);
