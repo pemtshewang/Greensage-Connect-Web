@@ -603,6 +603,7 @@ CAUw7C29C79Fv1C5qfPrmAESrciIxpg0X40KPMbp1ZWVbd4=
       pinMode(leftVentilationRollerShutterPinDown, OUTPUT);
       pinMode(soilMoisturePin, INPUT);
       pinMode(ldrPin,INPUT);
+      pinMode(motorPin, OUTPUT);
       digitalWrite(lightPin, !RELAY_ON);
       digitalWrite(exFanPin, !RELAY_ON);
       digitalWrite(waterValvePin, !RELAY_ON);
@@ -610,6 +611,7 @@ CAUw7C29C79Fv1C5qfPrmAESrciIxpg0X40KPMbp1ZWVbd4=
       digitalWrite(rightVentilationRollerShutterPinDown, !RELAY_ON);
       digitalWrite(leftVentilationRollerShutterPinUp, !RELAY_ON);
       digitalWrite(leftVentilationRollerShutterPinDown, !RELAY_ON);
+      digitalWrite(motorPin, !RELAY_ON);
 
       if (!display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS)) {
         Serial.println(F("SSD1306 allocation failed"));
