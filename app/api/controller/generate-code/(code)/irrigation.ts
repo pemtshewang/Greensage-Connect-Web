@@ -122,13 +122,13 @@ void handleMqttMessage(char* topic, byte* payload, unsigned int length) {
     receivedPayload += (char) payload[i];
   }
   Serial.print("Received MQTT message on topic: ");
-  Serial.println(topicStr);
+  Serial.println(receivedTopic);
   Serial.print("Payload: ");
   Serial.println(receivedPayload);
 
   // Handle valve control messages
-  if (topicStr.startsWith("user/" + userBrokerId + "/" + controllerBrokerId + "/actuator/valve/")) {
-    int valveIndex = topicStr.substring(topicStr.lastIndexOf("/") + 1).toInt();
+  if (receivedTopic.startsWith("user/" + userBrokerId + "/" + controllerBrokerId + "/actuator/valve/")) {
+    int valveIndex = receivedTopic.substring(receivedTopic.lastIndexOf("/") + 1).toInt();
     if (valveIndex >= 0 && valveIndex < numValves) {
       if (receivedPayload == "open") {
         Serial.print("Opening valve ");
@@ -147,8 +147,8 @@ void handleMqttMessage(char* topic, byte* payload, unsigned int length) {
   }
 
   // Handle scheduling messages
-  else if (topicStr.startsWith("user/" + userBrokerId + "/" + controllerBrokerId + "/schedule/valve/")) {
-    int valveIndex = topicStr.substring(topicStr.lastIndexOf("/") + 1).toInt();
+  else if (receivedTopic.startsWith("user/" + userBrokerId + "/" + controllerBrokerId + "/schedule/valve/")) {
+    int valveIndex = receivedTopic.substring(receivedTopic.lastIndexOf("/") + 1).toInt();
     if (valveIndex >= 0 && valveIndex < numValves) {
       int delimiterPos1 = receivedPayload.indexOf('|');
       String startTime = receivedPayload.substring(delimiterPos1 + 1, receivedPayload.lastIndexOf('|'));
