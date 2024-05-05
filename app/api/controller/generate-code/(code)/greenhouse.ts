@@ -12,7 +12,7 @@ export function generateGreenhouseCode(credentials: {
   wifiPassword: string;
 }) {
   return `
-     /**
+/**
      * @file main.cpp
      * @brief This code is for an ESP32 device that controls various components of a greenhouse or indoor gardening system.
      * It includes functionality for controlling lights, fans, water valves, and ventilation roller shutters.
@@ -20,7 +20,7 @@ export function generateGreenhouseCode(credentials: {
      * and a WebSocket server for remote monitoring and control.
      * @author Pem Tshewang
      * @date 7 march  2024
-     */
+**/
 
     #include <WiFi.h>
 
@@ -150,7 +150,7 @@ CAUw7C29C79Fv1C5qfPrmAESrciIxpg0X40KPMbp1ZWVbd4=
     /**
      * @brief Pin number for reading soil moisture data.
      */
-    const int soilMoisturePin = 34;
+    const int soilMoisturePin = 36;
 
     /**
      * @brief Pin number for controlling a water valve.
@@ -177,6 +177,8 @@ CAUw7C29C79Fv1C5qfPrmAESrciIxpg0X40KPMbp1ZWVbd4=
      */
     const int leftVentilationRollerShutterPinDown = 26;
 
+    const int motorPin = 25;
+
     /**
      * @brief Wi-Fi SSID for connecting to the local network.
      */
@@ -197,6 +199,7 @@ CAUw7C29C79Fv1C5qfPrmAESrciIxpg0X40KPMbp1ZWVbd4=
      */
     const int wetValue = 200;
 
+    const int ldrPin = 34;
     /**
      * @brief Flag indicating whether the exhaust fan is manually turned on or off.
      */
@@ -269,6 +272,7 @@ CAUw7C29C79Fv1C5qfPrmAESrciIxpg0X40KPMbp1ZWVbd4=
         if (startTime == String(currentTimeStr) && !isWaterValveScheduled) {
           // Perform actions for this slot
           Serial.println("Slot " + String(slotNumber) + " - Water valve is open");
+          digitalWrite(motorPin, RELAY_ON);
           digitalWrite(waterValvePin, RELAY_ON);
           isWaterValveScheduled = true;
           // Additional actions for this slot if needed
@@ -276,6 +280,7 @@ CAUw7C29C79Fv1C5qfPrmAESrciIxpg0X40KPMbp1ZWVbd4=
         if (String(currentTimeStr) == endTime && isWaterValveScheduled) {
           // Additional actions or cleanup for this slot
           Serial.println("Slot " + String(slotNumber) + " - Water valve is closed");
+          digitalWrite(motorPin, !RELAY_ON);
           digitalWrite(waterValvePin, !RELAY_ON);
           isWaterValveScheduled = false;
         }
@@ -383,9 +388,11 @@ CAUw7C29C79Fv1C5qfPrmAESrciIxpg0X40KPMbp1ZWVbd4=
         Serial.println("Water valve is " + message);
         isWaterValveManuallyOn = message == "open";
         if (message == "open") {
+          digitalWrite(motorPin, RELAY_ON);
           digitalWrite(waterValvePin, RELAY_ON);
           Serial.println("Water valve is open");
         } else {
+          digitalWrite(motorPin, !RELAY_ON);
           digitalWrite(waterValvePin, !RELAY_ON);
           Serial.println("Water valve is closed");
         }
@@ -570,7 +577,8 @@ CAUw7C29C79Fv1C5qfPrmAESrciIxpg0X40KPMbp1ZWVbd4=
           Serial.println("connected!");
           // subscribe to every topic
           // topic format: user/userBrokerId/topics
-          mqtt_client.subscribe(("user/" + userBrokerId + "/#").c_str());
+          mqtt_client.subscribe(("user/"+userBrokerId+"/#").c_str());
+          Serial.println("user/"+userBrokerId+"/#");
         } else {
           Serial.print("failed, rc = ");
           Serial.print(mqtt_client.state());
@@ -594,8 +602,9 @@ CAUw7C29C79Fv1C5qfPrmAESrciIxpg0X40KPMbp1ZWVbd4=
       pinMode(leftVentilationRollerShutterPinUp, OUTPUT);
       pinMode(leftVentilationRollerShutterPinDown, OUTPUT);
       pinMode(soilMoisturePin, INPUT);
+      pinMode(ldrPin,INPUT);
       digitalWrite(lightPin, !RELAY_ON);
-      digitalWrite(exFanPin, RELAY_ON);
+      digitalWrite(exFanPin, !RELAY_ON);
       digitalWrite(waterValvePin, !RELAY_ON);
       digitalWrite(rightVentilationRollerShutterPinUp, !RELAY_ON);
       digitalWrite(rightVentilationRollerShutterPinDown, !RELAY_ON);
@@ -619,6 +628,7 @@ CAUw7C29C79Fv1C5qfPrmAESrciIxpg0X40KPMbp1ZWVbd4=
       }
       // first time initialize to get time
       rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
+      
       if (rtc.lostPower()) {
         Serial.println("RTC lost power, lets set the time!");
         // following line sets the RTC to the date & time this sketch was compiled
@@ -635,23 +645,19 @@ CAUw7C29C79Fv1C5qfPrmAESrciIxpg0X40KPMbp1ZWVbd4=
       static float defaultThreshold = 25.0;
       prefs.putFloat("temp", defaultThreshold);
       randomSeed(micros());
-
+      
       WiFi.mode(WIFI_STA);
+      WiFi.softAP("${credentials.ap}", "${credentials.apPassword}");
+      
       WiFi.begin(ssid, password);
       while (WiFi.status() != WL_CONNECTED) {
         Serial.println("Connecting to wifi.....");
         delay(1000);
       }
-
       display.setTextSize(1);
       display.setTextColor(SSD1306_WHITE);
-      display.setCursor(0, 0);
       display.println(F("localIP:"));
       display.print(WiFi.localIP());
-      WiFi.softAP("${credentials.ap}", "${credentials.apPassword}");
-      display.println();
-      display.println("AP IP address: ");
-      display.print(WiFi.softAPIP());
       display.display();
 
       webSocket.begin();
@@ -668,7 +674,40 @@ CAUw7C29C79Fv1C5qfPrmAESrciIxpg0X40KPMbp1ZWVbd4=
     /**
      * @brief Main loop function.
      */
+    
+    void printTime(DateTime now) {
+        display.setTextSize(1);
+        display.setTextColor(SSD1306_WHITE);
+        // Clear the line by printing spaces
+        display.setCursor(0, 40);
+        display.print("                                 ");
+        // Move the cursor back to the start of the line and print the updated time
+        display.setCursor(0, 40);
+        char timeStr[16];
+        sprintf(timeStr, "%02d:%02d", now.hour(), now.minute());
+        display.print("Time: ");
+        display.println(timeStr);
+        display.display();
+    }
+     
+    static unsigned long lastTimeUpdate = 0;
+    const unsigned long timeUpdateInterval = 1000; // Update every second
     void loop() {
+      // printing the time on rtc
+      DateTime now = rtc.now();
+      if (millis() - lastTimeUpdate >= timeUpdateInterval) {
+        lastTimeUpdate = millis();
+        printTime(now);
+      }
+      
+      int ldrValue = digitalRead(ldrPin);
+      
+      if (ldrValue == 1) {
+        digitalWrite(lightPin, RELAY_ON); // Turn on the light
+      } else {
+        digitalWrite(lightPin, !RELAY_ON); // Turn off the light
+      }
+      
       if (!mqtt_client.connected())
         reconnect();
       mqtt_client.loop();
@@ -728,13 +767,16 @@ CAUw7C29C79Fv1C5qfPrmAESrciIxpg0X40KPMbp1ZWVbd4=
       }
 
       unsigned long currentTime = millis();
-      if (currentTime - lastReadingTime >= 7 * 60 * 1000 && webSocket.connectedClients() > 0) {
+      if (currentTime - lastReadingTime >= 1 * 60 * 1000 && webSocket.connectedClients() > 0) {
         // the readings are sent after 30 seconds from the current elapsed time
         int soilMoisture = getMoisturePercentage(analogRead(soilMoisturePin));
+        Serial.println("SoilMoisture:");
+        Serial.println(soilMoisture);
         if (!isnan(temperature) && !isnan(humidity && !isnan(soilMoisture))) {
           webSocket.broadcastTXT("temperature:" + String(temperature));
           webSocket.broadcastTXT("humidity:" + String(humidity));
           webSocket.broadcastTXT("soilMoisture:" + String(soilMoisture));
+          webSocket.broadcastTXT("light:" + String(soilMoisture));
         } else {
           Serial.println("Failed to read from BME sensor!");
         }
@@ -742,11 +784,11 @@ CAUw7C29C79Fv1C5qfPrmAESrciIxpg0X40KPMbp1ZWVbd4=
       }
 
       static unsigned long lastMqttPublishTime = 0;
-      if (currentTime - lastMqttPublishTime >= 7 * 60 * 1000) {
+      if (currentTime - lastMqttPublishTime >= 1 * 60 * 1000) {
         Serial.println("Next message will be published after 7 minutes");
         int soilMoisture = getMoisturePercentage(analogRead(soilMoisturePin));
         if (!isnan(temperature) && !isnan(humidity) && !isnan(soilMoisture)) {
-          String mqttMessage = "temperature:" + String(temperature) + "|humidity:" + String(humidity) + "|soilMoisture:" + String(soilMoisture);
+          String mqttMessage = "temperature:" + String(temperature) + "|humidity:" + String(humidity) + "|soilMoisture:" + String(soilMoisture) +"|"+"light:"+String(ldrValue);
           mqtt_client.publish(("user/" + userBrokerId + "/" + controllerBrokerId + "/readings").c_str(), mqttMessage.c_str());
           lastMqttPublishTime = currentTime;
         } else {
@@ -754,5 +796,5 @@ CAUw7C29C79Fv1C5qfPrmAESrciIxpg0X40KPMbp1ZWVbd4=
         }
     }
   } 
-`;
+  `;
 }
