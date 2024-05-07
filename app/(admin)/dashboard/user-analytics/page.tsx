@@ -7,7 +7,6 @@ import { ThresholdRecordsType } from "@/components/charts/EnvtParameters";
 import { useSearchParams } from "next/navigation";
 import Icons from "@/components/Icons";
 import { Suspense, useEffect, useState } from "react";
-import { format } from "date-fns";
 import ThresholdRecordGraph from "@/components/charts/EnvtParameters";
 import WaterChartGraph, {
   waterScheduleInterface,
