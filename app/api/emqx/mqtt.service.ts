@@ -25,20 +25,32 @@ export class MQTTServiceHandler {
       case "readings":
         console.log("updaing readings");
         const readings = payload.split("|");
-        const readingData = readings.reduce((acc, item) => {
-          const [type, value] = item.split(":");
-          acc[type] = parseFloat(value);
-          return acc;
-        }, {});
-        console.log(readingData);
-
-        await db.reading.create({
-          data: {
-            controllerId,
-            ...readingData,
-          },
+        const readingData = {};
+        readings.forEach((item) => {
+          const [identifier, value] = item.split(":");
+          switch (identifier) {
+            case "temperature":
+              readingData["temperature"] = parseFloat(value);
+              break;
+            case "humidity":
+              readingData["humidity"] = parseFloat(value);
+              break;
+            case "soilMoisture":
+              readingData["soilMoisture"] = parseFloat(value);
+              break;
+          }
         });
-        console.log("updated");
+        console.log(readingData);
+        try {
+          await db.reading.create({
+            data: {
+              controllerId,
+              ...readingData,
+            },
+          });
+        } catch (err) {
+          console.log(err);
+        }
         break;
       case "threshold":
         const type = action[0];
