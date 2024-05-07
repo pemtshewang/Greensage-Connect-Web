@@ -64,13 +64,13 @@ const WaterChartGraph = ({
       ])
       .range([0, width]);
 
-    const uniqueDays = [
-      ...new Set(
+    const uniqueDays = Array.from(
+      new Set(
         waterScheduleRecords.flatMap((d) =>
           decodeRepetitionDays(d.repetitionDays),
         ),
       ),
-    ];
+    );
 
     const y = d3.scaleBand().domain(uniqueDays).range([0, height]).padding(0.2);
 
