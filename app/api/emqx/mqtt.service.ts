@@ -1,5 +1,11 @@
 import { db } from "@/lib/db";
 
+interface Data {
+  temperature: number;
+  humidity: number;
+  soilMoisture: number;
+}
+
 export class MQTTServiceHandler {
   async handleMQTTMessage(topic: string, payload: string) {
     this.identifyTopics(topic, payload);
@@ -25,18 +31,22 @@ export class MQTTServiceHandler {
       case "readings":
         console.log("updaing readings");
         const readings = payload.split("|");
-        const readingData = {};
+        const readingData: Data = {
+          temperature: 0,
+          humidity: 0,
+          soilMoisture: 0,
+        };
         readings.forEach((item) => {
           const [identifier, value] = item.split(":");
           switch (identifier) {
             case "temperature":
-              readingData["temperature"] = parseFloat(value);
+              readingData.temperature = parseFloat(value);
               break;
             case "humidity":
-              readingData["humidity"] = parseFloat(value);
+              readingData.humidity = parseFloat(value);
               break;
             case "soilMoisture":
-              readingData["soilMoisture"] = parseFloat(value);
+              readingData.soilMoisture = parseFloat(value);
               break;
           }
         });
@@ -45,9 +55,12 @@ export class MQTTServiceHandler {
           await db.reading.create({
             data: {
               controllerId,
-              ...readingData,
+              soilMoisture: readingData.soilMoisture,
+              temperature: readingData.temperature,
+              humidity: readingData.humidity,
             },
           });
+          console.log("successful", readingData);
         } catch (err) {
           console.log(err);
         }
