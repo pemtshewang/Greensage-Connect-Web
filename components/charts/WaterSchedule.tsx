@@ -64,11 +64,15 @@ const WaterChartGraph = ({
       ])
       .range([0, width]);
 
-    const y = d3
-      .scaleBand()
-      .domain(waterScheduleRecords.map((d, i) => i.toString()))
-      .range([0, height])
-      .padding(0.2);
+    const uniqueDays = [
+      ...new Set(
+        waterScheduleRecords.flatMap((d) =>
+          decodeRepetitionDays(d.repetitionDays),
+        ),
+      ),
+    ];
+
+    const y = d3.scaleBand().domain(uniqueDays).range([0, height]).padding(0.2);
 
     svg
       .selectAll(".bar")
@@ -78,7 +82,7 @@ const WaterChartGraph = ({
       .attr("class", "bar")
       .attr("x", (d) => x(parseTime(d.startTime)))
       .attr("width", (d) => x(parseTime(d.endTime)) - x(parseTime(d.startTime)))
-      .attr("y", (d, i) => y(i.toString()))
+      .attr("y", (d) => y(decodeRepetitionDays(d.repetitionDays)))
       .attr("height", y.bandwidth())
       .style("fill", "#6FA8DC")
       .on("mouseover", (event, d) => {
@@ -106,11 +110,7 @@ const WaterChartGraph = ({
       .attr("transform", `translate(0, ${height})`)
       .call(d3.axisBottom(x).tickFormat(d3.timeFormat("%H:%M")));
 
-    svg
-      .append("g")
-      .call(
-        d3.axisLeft(y).tickFormat((d) => waterScheduleRecords[+d].startTime),
-      );
+    svg.append("g").call(d3.axisLeft(y));
 
     svg
       .append("text")
