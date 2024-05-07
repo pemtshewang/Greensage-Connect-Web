@@ -1,8 +1,6 @@
 "use client";
-
 import React, { useRef, useEffect } from "react";
 import * as d3 from "d3";
-
 export interface waterScheduleInterface {
   startTime: string;
   endTime: string;
@@ -33,11 +31,7 @@ const WaterChartGraph = ({
         decodedDays.push(daysOfWeek[i]);
       }
     }
-    // Return a map of days to their index
-    return decodedDays.reduce(
-      (acc, day, index) => ({ ...acc, [day]: index }),
-      {},
-    );
+    return decodedDays;
   };
 
   useEffect(() => {
@@ -66,16 +60,13 @@ const WaterChartGraph = ({
       ])
       .range([0, width]);
 
-    const decodedDays = waterScheduleRecords.map((record) =>
-      decodeRepetitionDays(record.repetitionDays),
-    );
-
+    //@ts-ignore
     const y = d3
       .scaleBand()
-      .domain(d3.merge(decodedDays).keys() as unknown as string[]) // Merge all decoded days and get unique keys
+      .domain(d3.range(waterScheduleRecords.length) as unknown as string[])
       .range([0, height])
       .padding(0.1)
-      .paddingOuter(0.2);
+      .paddingOuter(0.2); // Adjust outer padding for better visualization
 
     svg
       .selectAll(".bar")
@@ -84,7 +75,6 @@ const WaterChartGraph = ({
       .append("rect")
       .attr("class", "bar")
       .attr("x", (d) => x(parseTime(d.startTime)))
-      .attr("y", (d) => y(decodeRepetitionDays(d.repetitionDays)[d.startTime])) // Set y based on start time day
       .attr("width", (d) => x(parseTime(d.endTime)) - x(parseTime(d.startTime)))
       .attr("height", y.bandwidth()) // Set height based on bandwidth
       .style("fill", "#6FA8DC")
@@ -94,7 +84,7 @@ const WaterChartGraph = ({
         const tooltipContent = `
           <p>Start Time: ${d.startTime}</p>
           <p>End Time: ${d.endTime}</p>
-          <p>Repetition Days: ${Object.keys(decodedDays).join(", ")}</p>
+          <p>Repetition Days: ${decodedDays.join(", ")}</p>
         `;
         d3.select(tooltipRef.current)
           .style("display", "block")
@@ -112,7 +102,7 @@ const WaterChartGraph = ({
       .attr("transform", `translate(0, ${height})`)
       .call(d3.axisBottom(x));
     const leftAxis = svg.append("g"); // Create a new g for the left axis
-    leftAxis.call(d3.axisLeft(y)); // No need to set tickFormat
+    leftAxis.call(d3.axisLeft(y).tickFormat(() => "")); // Apply axis to g
   }, [waterScheduleRecords]);
   return (
     <div className="relative border-2 border-muted-foreground p-5 overflow-hidden">
