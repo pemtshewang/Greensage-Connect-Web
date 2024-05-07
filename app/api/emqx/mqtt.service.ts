@@ -19,6 +19,7 @@ export class MQTTServiceHandler {
 
   private async handleUserMessage(topic: string[], payload: string) {
     const [userBrokerId, controllerId, actionIdentifier, ...action] = topic;
+    console.log(controllerId);
 
     switch (actionIdentifier) {
       case "readings":
