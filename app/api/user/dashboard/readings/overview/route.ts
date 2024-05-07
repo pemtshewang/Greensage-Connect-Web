@@ -41,7 +41,7 @@ export async function GET(request: NextRequest) {
                   startTime: true,
                   endTime: true,
                   repetitionDays: true
-                }
+                },
               },
               HumidityThresholdRecord: {
                 select: {
