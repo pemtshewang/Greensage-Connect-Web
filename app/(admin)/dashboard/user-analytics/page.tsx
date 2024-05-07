@@ -97,18 +97,15 @@ const UserAnalyticPage = () => {
         </div>
       ) : (
         <div className="container space-y-4 lg:p-8">
-          <h3 className="font-semibold">
-            Analytics Generated for the target user
-          </h3>
+          <h3 className="font-semibold">Real Time Analytics Tracking</h3>
           <div className="flex justify-between">
             <span className="prose">
-              The analytics is based on the{" "}
-              {format(new Date(), "EEEE do MMMM hh:mm aa")}
+              The analytics will be updated after every 5 seconds
             </span>
             <span className="flex space-x-2 w-fit ml-auto">
               <Icons.info color="gray" />
               <p className="prose text-sm">
-                The graph generated are based on individual user
+                The graphs generated are based on individual user
               </p>
             </span>
           </div>
