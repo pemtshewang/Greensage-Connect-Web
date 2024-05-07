@@ -1,7 +1,7 @@
-"use client"
-import { ColumnDef } from "@tanstack/react-table"
-import { Button } from "@/components/ui/button"
-import { ArrowUpDown, MoreHorizontal } from "lucide-react"
+"use client";
+import { ColumnDef } from "@tanstack/react-table";
+import { Button } from "@/components/ui/button";
+import { ArrowUpDown, MoreHorizontal } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,27 +9,28 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { userTableColumnSchemaType } from "@/types"
-import { toast } from "sonner"
-import Link from "next/link"
-import Icons from "@/components/Icons"
+} from "@/components/ui/dropdown-menu";
+import { userTableColumnSchemaType } from "@/types";
+import { toast } from "sonner";
+import Link from "next/link";
+import Icons from "@/components/Icons";
+import { env } from "@/env";
 
 const deleteUserById = async (id: string) => {
-  const res = await fetch("http://localhost:3000/api/user", {
+  const res = await fetch(`${env.NEXT_PUBLIC_BASE_URL}/api/user`, {
     method: "DELETE",
     headers: {
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
     },
-    body: JSON.stringify({ id })
-  })
+    body: JSON.stringify({ id }),
+  });
   if (res.ok) {
-    toast.success("User deleted successfully")
-    return true
+    toast.success("User deleted successfully");
+    return true;
   }
   toast.error("Something went wrong");
   return false;
-}
+};
 
 export const columns: ColumnDef<userTableColumnSchemaType>[] = [
   {
@@ -47,7 +48,7 @@ export const columns: ColumnDef<userTableColumnSchemaType>[] = [
           Citizen ID
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
-      )
+      );
     },
   },
   // side actions for respective row
@@ -59,7 +60,7 @@ export const columns: ColumnDef<userTableColumnSchemaType>[] = [
       </div>
     ),
     cell: ({ row }) => {
-      const user = row.original
+      const user = row.original;
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -72,16 +73,15 @@ export const columns: ColumnDef<userTableColumnSchemaType>[] = [
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuItem
               onClick={() => deleteUserById(user.id)}
-              className="flex space-x-3">
-              <span>
-                Delete User
-              </span>
+              className="flex space-x-3"
+            >
+              <span>Delete User</span>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem>View Details</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
-      )
+      );
     },
   },
   {
@@ -93,11 +93,14 @@ export const columns: ColumnDef<userTableColumnSchemaType>[] = [
     ),
     cell: ({ row }) => {
       return (
-        <Link className="flex space-x-2 underline" href={`/dashboard/user-analytics?id=${row.original.id}`}>
+        <Link
+          className="flex space-x-2 underline"
+          href={`/dashboard/user-analytics?id=${row.original.id}`}
+        >
           <p>Analytics</p>
           <Icons.dashboard />
         </Link>
-      )
+      );
     },
   },
-]
+];

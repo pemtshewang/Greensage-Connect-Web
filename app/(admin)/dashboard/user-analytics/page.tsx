@@ -48,6 +48,7 @@ interface AnalyticsType {
     recordedAt: string;
   }[];
 }
+
 const UserAnalyticPage = () => {
   const searchParams = useSearchParams();
   const [generating, setGenerating] = useState<boolean>(true);
@@ -59,11 +60,18 @@ const UserAnalyticPage = () => {
   });
   const [wsData, setWSData] = useState<waterScheduleInterface[]>([]);
   const id = searchParams.get("id");
+
   useEffect(() => {
-    getUserAnalyticsData({ id: id as string }).then((res) => {
+    const fetchData = async () => {
+      const res = await getUserAnalyticsData({ id: id as string });
       setUserData(res);
-      console.log("data is->", res);
-    });
+    };
+
+    fetchData();
+
+    const interval = setInterval(fetchData, 7000); // Fetch data every 7 seconds
+
+    return () => clearInterval(interval); // Clean up the interval on component unmount
   }, [id]);
 
   useEffect(() => {
@@ -77,10 +85,11 @@ const UserAnalyticPage = () => {
       setGenerating(false); // Move setGenerating inside the callback to ensure it runs after setting userData
     }
   }, [data]);
+
   return (
     <>
       {generating ? (
-        <div className="container flex items-center flex-col  justify-center space-y-2 lg:mt-40">
+        <div className="container flex items-center flex-col justify-center space-y-2 lg:mt-40">
           <Icons.userListLoading width={72} height={72} />
           <p className="animate-pulse delay-1000 font-mono">
             Generating Analytics For User
@@ -113,4 +122,5 @@ const UserAnalyticPage = () => {
     </>
   );
 };
+
 export default UserAnalyticPage;
