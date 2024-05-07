@@ -8,7 +8,7 @@ interface Data {
   soilMoisture: number;
 }
 
-export class MQTTServiceHandler {
+class MQTTServiceHandler {
   async handleMQTTMessage(topic: string, payload: string) {
     this.identifyTopics(topic, payload);
   }
