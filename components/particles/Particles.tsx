@@ -32,7 +32,6 @@ export const ParticlesComponent = () => {
     () => ({
       background: {
         color: {
-          value: theme === "dark" ? "#000" : "#000",
         },
         opacity: 0.4,
       },
@@ -119,7 +118,7 @@ export const ParticlesComponent = () => {
         },
       ],
     }),
-    [theme],
+    [theme]
   );
 
   return init ? (

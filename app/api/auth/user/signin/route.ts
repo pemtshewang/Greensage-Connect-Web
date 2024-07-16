@@ -25,6 +25,7 @@ export async function POST(req: Request) {
       verifiedAt: true,
     },
   });
+
   const accessToken = await db.accessToken.findUnique({
     where: {
       userId: user?.id,
@@ -32,7 +33,7 @@ export async function POST(req: Request) {
   });
   const isPasswordCorrect = await checkPassword(
     password,
-    user?.password as string,
+    user?.password as string
   );
   if (user?.verifiedAt) {
     delete user["verifiedAt"];
@@ -53,11 +54,10 @@ export async function POST(req: Request) {
       }
     }
   }
-
   return NextResponse.json(
     { message: "Invalid username or password" },
     {
       status: 401,
-    },
+    }
   );
 }
