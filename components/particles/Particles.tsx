@@ -31,8 +31,6 @@ export const ParticlesComponent = () => {
   const options = useMemo(
     () => ({
       background: {
-        color: {
-        },
         opacity: 0.4,
       },
       fpsLimit: 120,
