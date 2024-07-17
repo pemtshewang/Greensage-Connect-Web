@@ -23,6 +23,7 @@ import {
   PanelLeftOpenIcon,
   PanelRightClose,
   PencilIcon,
+  Settings2Icon,
   SettingsIcon,
   SunIcon,
   TargetIcon,
@@ -378,6 +379,7 @@ const Icons = {
       </g>
     </svg>
   ),
+  systemMetricsIcon: Settings2Icon,
 };
 
 export default Icons;

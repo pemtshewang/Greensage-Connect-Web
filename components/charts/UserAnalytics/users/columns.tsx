@@ -1,4 +1,5 @@
 "use client";
+
 import { ColumnDef } from "@tanstack/react-table";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { ArrowUpDown, MoreHorizontal } from "lucide-react";
@@ -16,8 +17,26 @@ import Link from "next/link";
 import Icons from "@/components/Icons";
 import { env } from "@/env";
 import { cn } from "@/lib/utils";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import {
+  DataTableUserType,
+  useTableChangeState,
+} from "@/context/DataTableContext";
 
-const deleteUserById = async (id: string) => {
+const deleteUserById = async (
+  id: string,
+  changeTableState: DataTableUserType
+) => {
   const res = await fetch(`${env.NEXT_PUBLIC_BASE_URL}/api/user`, {
     method: "DELETE",
     headers: {
@@ -25,11 +44,14 @@ const deleteUserById = async (id: string) => {
     },
     body: JSON.stringify({ id }),
   });
+  const respObj = await res.json();
+  console.log(res.status);
+  // fix this part
   if (res.ok) {
     toast.success("User deleted successfully");
-    return true;
+    changeTableState.setIsChanged(true);
   }
-  toast.error("Something went wrong");
+  toast.error(respObj?.message);
   return false;
 };
 
@@ -51,6 +73,7 @@ export const columns: ColumnDef<userTableColumnSchemaType>[] = [
         </Button>
       );
     },
+    cell: ({ row }) => <div className="ml-4">{row.original.cid}</div>,
   },
   // side actions for respective row
   {
@@ -62,21 +85,42 @@ export const columns: ColumnDef<userTableColumnSchemaType>[] = [
     ),
     cell: ({ row }) => {
       const user = row.original;
+      const changeTableState = useTableChangeState();
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
+            <Button variant="outline" className="h-8 w-8 p-0">
               <span className="sr-only">Open menu</span>
               <MoreHorizontal className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem
-              onClick={() => deleteUserById(user.id)}
-              className="flex space-x-3"
-            >
-              <span>Delete User</span>
+            <DropdownMenuItem asChild className="flex space-x-3">
+              <AlertDialog>
+                <AlertDialogTrigger className="relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50">
+                  Delete User
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>
+                      Are you absolutely sure?
+                    </AlertDialogTitle>
+                    <AlertDialogDescription>
+                      This action cannot be undone. This will permanently delete
+                      user's account.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={() => deleteUserById(user.id, changeTableState)}
+                    >
+                      Delete
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem>View Details</DropdownMenuItem>

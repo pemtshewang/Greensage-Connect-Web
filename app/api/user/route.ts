@@ -50,6 +50,7 @@ export async function POST(req: NextRequest) {
   const user = await db.user.create({
     data: {
       ...trimmedUser,
+
       password: hashedPassword, // Use the hashed password
     },
   });

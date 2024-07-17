@@ -39,14 +39,6 @@ const SystemMetricsPage = () => {
       {/* Conditionally render the iframe */}
       {!graphLoading && (
         <>
-          <span className="container flex space-x-4 mb-2">
-            <Icons.info />
-            <code className="text-muted-foreground">
-              The graph is externally powered and rendered through graphana
-              public dashboard
-            </code>
-          </span>
-
           {/* <Iframe */}
           {/*   url={url} */}
           {/*   frameBorder={0} */}

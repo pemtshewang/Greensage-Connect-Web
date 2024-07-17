@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import Icons from "../Icons";
 import { Skeleton } from "../ui/skeleton";
 import { format } from "date-fns";
+import { ScrollArea } from "../ui/scroll-area";
 
 const getUsersJoinedCount = async () => {
   const res = await fetch(
@@ -14,7 +15,7 @@ const getUsersJoinedCount = async () => {
       next: {
         revalidate: 5,
       },
-    },
+    }
   );
   const count = await res.json();
   return count;
@@ -28,7 +29,7 @@ const getUsersRecentJoinedList = async () => {
       next: {
         revalidate: 5,
       },
-    },
+    }
   );
   const list = await res.json();
   return list;
@@ -43,7 +44,7 @@ const getUsersOnlineCount = async () => {
       next: {
         revalidate: 5,
       },
-    },
+    }
   );
   const count = await res.json();
   return count;
@@ -128,20 +129,22 @@ const UserRecentJoinedCard = ({
   date: string;
 }) => {
   return (
-    <div className=" flex border border-muted rounded-sm p-3">
+    <div className=" flex border border-muted rounded-sm p-3 mt-3 shadow">
       <span className="p-3">
         <Icons.userRound size={28} />
       </span>
-      <span className="flex-col">
-        <h4>{name}</h4>
-        <p className="prose">
-          {gewog},{dzongkhag}
-        </p>
-      </span>
-      <span className="w-fit ml-auto">
-        <p className="prose">Joined on</p>
-        <p>{format(new Date(date), "EEE, do MMM yyyy hh:mm aa")}</p>
-      </span>
+      <div>
+        <span className="flex-col">
+          <h4>{name}</h4>
+          <p className="prose">
+            {gewog},{dzongkhag}
+          </p>
+        </span>
+        <span className="flex space-x-2">
+          <p className="prose">Joined on</p>
+          <p>{format(new Date(date), "EEE, do MMM yyyy hh:mm aa")}</p>
+        </span>
+      </div>
     </div>
   );
 };
@@ -157,7 +160,7 @@ export const RecentlyJoinedList = () => {
   useEffect(() => {
     getUsersRecentJoinedList()
       .then((data) => {
-        setUsers(data);
+        setUsers(data.reverse());
         setLoading(false);
       })
       .catch((err) => {
@@ -165,14 +168,18 @@ export const RecentlyJoinedList = () => {
       });
   }, []);
   return (
-    <Card className="container min-h-[30vh] pb-3 ">
-      <CardHeader className="p-1 font-semibold">
-        <span className="flex space-x-3 p-3">
+    <div className="container min-h-[30vh] pb-3 shadow">
+      <div className="p-1  flex justify-between items-center">
+        {" "}
+        <span className="flex space-x-3 p-3 font-semibold">
           <h3>Users Recently Joined</h3>
           <Icons.usersJoined />
         </span>
-      </CardHeader>
-      <CardContent className="p-3">
+        <p className="text-muted-foreground text-sm">
+          Scroll Down 
+        </p>
+      </div>
+      <div className="p-3">
         <div className="flex-col justify-center space-y-2">
           {loading ? (
             <>
@@ -181,15 +188,17 @@ export const RecentlyJoinedList = () => {
               <UsersRecentJoinedCardSkeleton />
             </>
           ) : users.length > 0 ? (
-            users.map((item) => (
-              <UserRecentJoinedCard
-                key={item.username}
-                date={item?.registeredAt as string}
-                name={item?.username as string}
-                gewog={item?.gewog as string}
-                dzongkhag={item?.dzongkhag as string}
-              />
-            ))
+            <ScrollArea className="h-[400px] w-[550px]">
+              {users.map((item) => (
+                <UserRecentJoinedCard
+                  key={item.username}
+                  date={item?.registeredAt as string}
+                  name={item?.username as string}
+                  gewog={item?.gewog as string}
+                  dzongkhag={item?.dzongkhag as string}
+                />
+              ))}
+            </ScrollArea>
           ) : (
             <>
               <Icons.emptyUsers className="w-8 h-8 mx-auto" />
@@ -199,7 +208,7 @@ export const RecentlyJoinedList = () => {
             </>
           )}
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 };
