@@ -1,6 +1,6 @@
 "use client";
 import { ColumnDef } from "@tanstack/react-table";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { ArrowUpDown, MoreHorizontal } from "lucide-react";
 import {
   DropdownMenu,
@@ -15,6 +15,7 @@ import { toast } from "sonner";
 import Link from "next/link";
 import Icons from "@/components/Icons";
 import { env } from "@/env";
+import { cn } from "@/lib/utils";
 
 const deleteUserById = async (id: string) => {
   const res = await fetch(`${env.NEXT_PUBLIC_BASE_URL}/api/user`, {
@@ -94,7 +95,12 @@ export const columns: ColumnDef<userTableColumnSchemaType>[] = [
     cell: ({ row }) => {
       return (
         <Link
-          className="flex space-x-2 underline"
+          className={cn(
+            `flex space-x-2`,
+            buttonVariants({
+              variant: "outline",
+            })
+          )}
           href={`/dashboard/user-analytics?id=${row.original.id}`}
         >
           <p>Analytics</p>

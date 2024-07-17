@@ -9,17 +9,19 @@ export default function AuthLayout({
 }) {
   return (
     <div className="bg-image flex items-center justify-center h-screen">
+      <div className="relative">
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
           enableSystem
           disableTransitionOnChange
         >
-          <div className="absolute right-0 p-5 mr-3 z-10">
+          <div className="absolute top-14 right-4">
             <ModeToggle />
           </div>
         </ThemeProvider>
       {children}
+      </div>
     </div>
   );
 }
