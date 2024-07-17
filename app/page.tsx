@@ -37,7 +37,7 @@ export default async function Home() {
           />
           <div>
             <h1 className="text-xl font-bold text-white">
-              Nurturing Nature, Nurturing Growth
+              Blending Internet of Things with Modern Agriculture 
             </h1>
           </div>
         </div>

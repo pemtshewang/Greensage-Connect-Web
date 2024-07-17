@@ -42,9 +42,9 @@ export default function LoginForm() {
   const [loading, setLoading] = useState<boolean>(false);
   return (
     <form onSubmit={handleSubmit(handleSubmittedData)}>
-      <div className="flex-col justify-center items-center p-8 rounded-lg lg:min-w-[400px]">
+      <div className="flex-col justify-center items-center p-8 rounded-lg lg:min-w-[400px] shadow-xl">
         <div className="w-fit mx-auto">
-          <Image className="w-56 h-56" src={logo} alt="logo" />
+          <Image draggable={false} className="w-56 h-56 no-image-drag" src={logo} alt="logo" />
         </div>
         <div className="flex-col space-y-2">
           <div>
@@ -55,7 +55,7 @@ export default function LoginForm() {
             </p>
             <Input
               className="input w-full"
-              placeholder="username"
+              placeholder="Username or Email"
               {...register("username")}
             />
             <p className="text-red-600 h-5">
@@ -72,7 +72,7 @@ export default function LoginForm() {
               <Input
                 type={showPassword ? "text" : "password"}
                 className="w-full"
-                placeholder="password"
+                placeholder="Password"
                 {...register("password")}
               />
               <Button
@@ -107,6 +107,12 @@ export default function LoginForm() {
               <>Login</>
             )}
           </Button>
+        </div>
+        <div className="flex items-center space-x-1 my-3 mt-6">
+          <Icons.customerSupportIcon className="w-6 h-6 dark:fill-white" />
+          <p className="text-muted-foreground select-none">
+            Forgot password, Contact the Support Team
+          </p>
         </div>
         <Footer className="flex justify-center mt-5 space-x-1" />
       </div>
