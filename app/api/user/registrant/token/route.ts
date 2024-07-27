@@ -106,7 +106,6 @@ export async function GET(request: NextRequest) {
 
 export async function PATCH(request: NextRequest) {
   const { tokenId } = await request.json();
-  console.log("Parsed Json: ", JSON.parse(tokenId));
   if (tokenId != null) {
     const validRegToken = await db.registrantToken.findUnique({
       // @ts-ignore
@@ -115,6 +114,7 @@ export async function PATCH(request: NextRequest) {
       },
     });
     if (validRegToken.token != null) {
+      console.log(validRegToken);
       return NextResponse.json(
         {
           message: "Registrant Token verified",
