@@ -3,7 +3,7 @@ import { checkPassword, hashPassword } from "@/utils/bcryptMgr";
 import { getUser } from "@/lib/session";
 import { db } from "@/lib/db";
 //check the password
-export async function PATCH(req: Request) {
+export async function PATCH(req:Request) {
   const user = await getUser();
   const formData = await req.formData();
   const password = formData.get("password").toString();

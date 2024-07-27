@@ -2,34 +2,69 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { LockIcon, UserIcon } from "lucide-react";
 import PasswordChangeForm from "./form-passwd";
+import Icons from "@/components/Icons";
+import { Separator } from "@/components/ui/separator";
+
 export default function SettingsTab() {
   return (
     <Tabs defaultValue="password" className="lg:max-w-[800px]  mx-auto">
-      <div className="grid grid-cols-2 h-full">
-        <div>
+      {" "}
+      <div className="grid grid-cols-12 h-full">
+        <div className="max-w-sm col-span-3">
           <TabsList className="flex-col h-full space-y-2 bg-transparent justify-start">
+            <div className="w-full flex justify-start">
+              <h1 className="font-bold">Credentials</h1>
+            </div>
+            <Separator orientation="horizontal" />
             <TabsTrigger
               value="password"
               className="space-x-2 focus:border border-muted-foreground"
+              role="link"
+              id="password"
             >
-              <span>Password Setting</span> <LockIcon />
+              <a href="#password">Password Setting</a> <LockIcon />
             </TabsTrigger>
             <TabsTrigger
               value="credentials"
               className="space-x-2 focus:border border-muted-foreground"
+              id="credentials"
             >
-              <span>Admin Credentials</span> <UserIcon />
+              <a href="#credentials">Admin Credentials</a> <UserIcon />
+            </TabsTrigger>
+            <div className="w-full flex justify-start">
+              <h1 className="font-bold">Tokens</h1>
+            </div>
+            <Separator orientation="horizontal" />
+            <TabsTrigger
+              value="tokens"
+              className="space-x-2 focus:border border-muted-foreground"
+              id="tokens"
+            >
+              <a href="#tokens">List/Revoke Tokens</a>{" "}
+              <Icons.token className="w-6 h-6" />
+            </TabsTrigger>
+            <TabsTrigger
+              value="gen-tokens"
+              className="space-x-2 focus:border border-muted-foreground"
+              id="gen-tokens"
+            >
+              <a href="#gen-tokens">Generate Tokens</a>{" "}
+              <Icons.token className="w-6 h-6" />
             </TabsTrigger>
           </TabsList>
         </div>
-        <div>
+        <div className="col-span-9">
           <TabsContent value="password">
             <PasswordChangeForm />
           </TabsContent>
           <TabsContent value="credentials">
-            <h1 className="text-muted-foreground italic">Features will be added soon...</h1>
+            <h1 className="text-muted-foreground italic">
+              Features will be added soon...
+            </h1>
           </TabsContent>
+          <TabsContent value="tokens"></TabsContent>
         </div>
+        <TabsContent value="gen-tokens"></TabsContent>
       </div>
     </Tabs>
   );
