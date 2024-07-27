@@ -44,13 +44,6 @@ export async function POST(req: NextRequest) {
     trimmedUser.posLong = long;
   }
   const hashedPassword = await hashPassword(form.get("password").toString());
-  const user = await db.user.create({
-    data: {
-      ...trimmedUser,
-
-      password: hashedPassword, // Use the hashed password
-    },
-  });
   // verify if the provided number is valid or not
   return NextResponse.json(
     {
