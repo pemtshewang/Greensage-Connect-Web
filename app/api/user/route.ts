@@ -1,11 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { hashPassword } from "@/utils/bcryptMgr";
 import { db } from "@/lib/db";
-import { verifyNumber } from "@/utils/verify-sms";
 import { getUser } from "@/lib/session";
 import { generateBrokerId } from "./verify-user/emqx";
-import { getRandomDigits } from "@/utils/otp-generator";
-import { sendUserOTP } from "@/utils/sms-gateway";
 import { env } from "@/env";
 
 interface User {
@@ -55,33 +52,6 @@ export async function POST(req: NextRequest) {
     },
   });
   // verify if the provided number is valid or not
-  const validNumber = await verifyNumber(form.get("mobile").toString());
-  // if given number is valid
-  if (validNumber) {
-    const otpDigits = getRandomDigits().toString();
-    const expirationTime = new Date(new Date().getTime() + 10 * 60000);
-    const sendOTP = await sendUserOTP({
-      otpDigits,
-      phoneNumber: form.get("mobile").toString(),
-    });
-    if (sendOTP.success) {
-      await db.user.update({
-        where: {
-          id: user.id,
-        },
-        data: {
-          otp: Number(otpDigits),
-          otpExpiresAt: expirationTime,
-        },
-      });
-      return NextResponse.json(
-        {
-          id: user.id,
-        },
-        { status: 200 },
-      );
-    }
-  }
   return NextResponse.json(
     {
       message: "There was an error while creating the user",

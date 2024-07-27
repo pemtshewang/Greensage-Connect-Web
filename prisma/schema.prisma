@@ -17,14 +17,14 @@ model Admin {
 }
 
 model User {
-  id              String        @id @default(auto()) @map("_id") @db.ObjectId
-  username        String        @unique
+  id              String          @id @default(auto()) @map("_id") @db.ObjectId
+  username        String          @unique
   password        String
-  cid             String        @unique
-  mobile          String        @unique
+  cid             String          @unique
+  mobile          String          @unique
   gewog           String
   dzongkhag       String
-  registeredAt    DateTime      @default(now())
+  registeredAt    DateTime        @default(now())
   verifiedAt      DateTime?
   posLat          String?
   posLong         String?
@@ -32,11 +32,13 @@ model User {
   otpExpiresAt    DateTime?
   controllers     Controller[]
   accessToken     AccessToken[]
-  greenhouseCount Int           @default(0)
-  irrigationCount Int           @default(0)
-  brokerId        String        @unique
+  greenhouseCount Int             @default(0)
+  irrigationCount Int             @default(0)
+  brokerId        String          @unique
   brokerPort      Int
   brokerIp        String
+  registrant      RegistrantToken @relation(fields: [registrantId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  registrantId    String          @unique @db.ObjectId
 }
 
 enum Type {
@@ -131,10 +133,20 @@ enum ThresholdType {
 }
 
 model EnvironmentParameterThreshold {
-  id           String @id @default(auto()) @map("_id") @db.ObjectId
+  id           String        @id @default(auto()) @map("_id") @db.ObjectId
   name         String
-  minThreshold Float  @default(0.0)
-  maxThreshold Float  @default(0.0)
+  minThreshold Float         @default(0.0)
+  maxThreshold Float         @default(0.0)
+  createdAt    DateTime      @default(now())
+  type         ThresholdType
+}
+
+//register token will be used by one of the users
+model RegistrantToken {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  token     String
+  remarks   String
+  hasUser   Boolean  @default(false)
   createdAt DateTime @default(now())
-  type ThresholdType
+  User      User[]
 }

@@ -11,6 +11,7 @@ import {
   EyeIcon,
   EyeOffIcon,
   FilePlus2Icon,
+  FolderKeyIcon,
   HelpCircle,
   InfoIcon,
   KeyIcon,
@@ -380,6 +381,7 @@ const Icons = {
     </svg>
   ),
   systemMetricsIcon: Settings2Icon,
+  emptyTokenFolder: FolderKeyIcon,
 };
 
 export default Icons;

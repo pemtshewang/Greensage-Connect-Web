@@ -4,11 +4,12 @@ import { LockIcon, UserIcon } from "lucide-react";
 import PasswordChangeForm from "./form-passwd";
 import Icons from "@/components/Icons";
 import { Separator } from "@/components/ui/separator";
+import ListTokensPage from "./(tokens)/list-tokens";
+import GenerateTokenForm from "./(tokens)/generate-token-form";
 
 export default function SettingsTab() {
   return (
     <Tabs defaultValue="password" className="lg:max-w-[800px]  mx-auto">
-      {" "}
       <div className="grid grid-cols-12 h-full">
         <div className="max-w-sm col-span-3">
           <TabsList className="flex-col h-full space-y-2 bg-transparent justify-start">
@@ -40,7 +41,7 @@ export default function SettingsTab() {
               className="space-x-2 focus:border border-muted-foreground"
               id="tokens"
             >
-              <a href="#tokens">List/Revoke Tokens</a>{" "}
+              <a href="#tokens">List/Revoke Tokens</a>
               <Icons.token className="w-6 h-6" />
             </TabsTrigger>
             <TabsTrigger
@@ -62,9 +63,13 @@ export default function SettingsTab() {
               Features will be added soon...
             </h1>
           </TabsContent>
-          <TabsContent value="tokens"></TabsContent>
+          <TabsContent value="tokens">
+            <ListTokensPage />
+          </TabsContent>
+          <TabsContent value="gen-tokens">
+            <GenerateTokenForm />
+          </TabsContent>
         </div>
-        <TabsContent value="gen-tokens"></TabsContent>
       </div>
     </Tabs>
   );
