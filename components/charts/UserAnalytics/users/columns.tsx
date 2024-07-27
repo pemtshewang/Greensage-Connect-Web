@@ -28,15 +28,8 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import {
-  DataTableUserType,
-  useTableChangeState,
-} from "@/context/DataTableContext";
 
-const deleteUserById = async (
-  id: string,
-  changeTableState: DataTableUserType
-) => {
+const deleteUserById = async (id: string) => {
   const res = await fetch(`${env.NEXT_PUBLIC_BASE_URL}/api/user`, {
     method: "DELETE",
     headers: {
@@ -49,7 +42,6 @@ const deleteUserById = async (
   // fix this part
   if (res.ok) {
     toast.success("User deleted successfully");
-    changeTableState.setIsChanged(true);
   }
   toast.error(respObj?.message);
   return false;
@@ -85,7 +77,6 @@ export const columns: ColumnDef<userTableColumnSchemaType>[] = [
     ),
     cell: ({ row }) => {
       const user = row.original;
-      const changeTableState = useTableChangeState();
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -113,9 +104,7 @@ export const columns: ColumnDef<userTableColumnSchemaType>[] = [
                   </AlertDialogHeader>
                   <AlertDialogFooter>
                     <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction
-                      onClick={() => deleteUserById(user.id, changeTableState)}
-                    >
+                    <AlertDialogAction onClick={() => deleteUserById(user.id)}>
                       Delete
                     </AlertDialogAction>
                   </AlertDialogFooter>
@@ -143,7 +132,7 @@ export const columns: ColumnDef<userTableColumnSchemaType>[] = [
             `flex space-x-2`,
             buttonVariants({
               variant: "outline",
-            })
+            }),
           )}
           href={`/dashboard/user-analytics?id=${row.original.id}`}
         >
