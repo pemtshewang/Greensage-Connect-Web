@@ -107,6 +107,7 @@ export async function GET(request: NextRequest) {
 export async function PATCH(request: NextRequest) {
   const { tokenId } = await request.json();
   if (tokenId != null) {
+    console.log(tokenId);
     const validRegToken: Prisma.RegistrantTokenWhereUniqueInput =
       await db.registrantToken.findUnique({
         // @ts-ignore
@@ -114,7 +115,8 @@ export async function PATCH(request: NextRequest) {
           token: tokenId,
         },
       });
-    if (validRegToken) {
+    console.log(validRegToken);
+    if (validRegToken.token != null) {
       return NextResponse.json(
         {
           message: "Registrant Token verified",
