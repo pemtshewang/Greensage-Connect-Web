@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getUser } from "@/lib/session";
 import { generateUniqueToken } from "@/utils/token-generator";
 import { db } from "@/lib/db";
+import { Prisma, PrismaClient } from "@prisma/client";
 
 export async function POST(request: NextRequest) {
   const user = await getUser();
@@ -100,6 +101,46 @@ export async function GET(request: NextRequest) {
   return NextResponse.json(
     { message: "You are forbidden from requested operation" },
     { status: 403 },
+  );
+}
+
+export async function PATCH(request: NextRequest) {
+  const { tokenId } = await request.json();
+  if (tokenId != null) {
+    const validRegToken: Prisma.RegistrantTokenWhereUniqueInput =
+      await db.registrantToken.findUnique({
+        // @ts-ignore
+        where: {
+          token: tokenId,
+        },
+      });
+    if (validRegToken) {
+      return NextResponse.json(
+        {
+          message: "Registrant Token verified",
+        },
+        {
+          status: 200,
+        },
+      );
+    } else {
+      return NextResponse.json(
+        {
+          message: "Not a valid registrant token",
+        },
+        {
+          status: 404,
+        },
+      );
+    }
+  }
+  return NextResponse.json(
+    {
+      message: "Empty Registrant number",
+    },
+    {
+      status: 400,
+    },
   );
 }
 
