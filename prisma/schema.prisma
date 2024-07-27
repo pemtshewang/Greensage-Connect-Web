@@ -144,7 +144,7 @@ model EnvironmentParameterThreshold {
 //register token will be used by one of the users
 model RegistrantToken {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  token     String
+  token     String   @unique
   remarks   String
   hasUser   Boolean  @default(false)
   createdAt DateTime @default(now())
