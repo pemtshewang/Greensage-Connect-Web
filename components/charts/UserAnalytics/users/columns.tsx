@@ -99,7 +99,7 @@ export const columns: ColumnDef<userTableColumnSchemaType>[] = [
                     </AlertDialogTitle>
                     <AlertDialogDescription>
                       This action cannot be undone. This will permanently delete
-                      user's account.
+                      user&apos;s account.
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
