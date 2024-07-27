@@ -106,16 +106,14 @@ export async function GET(request: NextRequest) {
 
 export async function PATCH(request: NextRequest) {
   const { tokenId } = await request.json();
+  console.log("Parsed Json: ", JSON.parse(tokenId));
   if (tokenId != null) {
-    console.log(tokenId);
-    const validRegToken: Prisma.RegistrantTokenWhereUniqueInput =
-      await db.registrantToken.findUnique({
-        // @ts-ignore
-        where: {
-          token: tokenId,
-        },
-      });
-    console.log(validRegToken);
+    const validRegToken = await db.registrantToken.findUnique({
+      // @ts-ignore
+      where: {
+        token: JSON.parse(tokenId),
+      },
+    });
     if (validRegToken.token != null) {
       return NextResponse.json(
         {
