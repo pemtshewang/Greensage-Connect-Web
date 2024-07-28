@@ -28,8 +28,6 @@ model User {
   verifiedAt      DateTime?
   posLat          String?
   posLong         String?
-  otp             Int?
-  otpExpiresAt    DateTime?
   controllers     Controller[]
   accessToken     AccessToken[]
   greenhouseCount Int             @default(0)
