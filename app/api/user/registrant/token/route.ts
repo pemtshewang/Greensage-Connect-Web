@@ -113,8 +113,7 @@ export async function PATCH(request: NextRequest) {
         token: tokenId,
       },
     });
-    if (validRegToken.token != null) {
-      console.log(validRegToken);
+    if (validRegToken) {
       return NextResponse.json(
         {
           message: "Registrant Token verified",
