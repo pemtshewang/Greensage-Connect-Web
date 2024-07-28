@@ -114,12 +114,22 @@ export async function PATCH(request: NextRequest) {
       },
     });
     if (validRegToken) {
+      if (!validRegToken.hasUser) {
+        return NextResponse.json(
+          {
+            message: "Registrant Token verified",
+          },
+          {
+            status: 200,
+          },
+        );
+      }
       return NextResponse.json(
         {
-          message: "Registrant Token verified",
+          message: "Registrant Token has already been used",
         },
         {
-          status: 200,
+          status: 400,
         },
       );
     } else {
