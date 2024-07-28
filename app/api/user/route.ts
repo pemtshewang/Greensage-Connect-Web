@@ -3,7 +3,6 @@ import { hashPassword } from "@/utils/bcryptMgr";
 import { db } from "@/lib/db";
 import { generateBrokerId } from "./verify-user/emqx";
 import { env } from "@/env";
-import { Prisma } from "@prisma/client";
 import { getUser } from "@/lib/session";
 
 interface User {
@@ -46,16 +45,36 @@ export async function POST(req: NextRequest) {
         throw new Error("Registrant token has already been used");
       }
 
-      const brokerId = generateBrokerId(
-        form.get("username")?.toString().trim() || "",
-        form.get("mobile")?.toString().trim() || "",
-      );
+      const username = form.get("username")?.toString().trim() || "";
+      const cid = form.get("cid")?.toString().trim() || "";
+      const mobile = form.get("mobile")?.toString().trim() || "";
+
+      // Check for existing credentials
+      const existingUser = await prisma.user.findFirst({
+        where: {
+          OR: [{ username: username }, { cid: cid }, { mobile: mobile }],
+        },
+      });
+
+      if (existingUser) {
+        let message = "";
+        if (existingUser.username === username) {
+          message = "Username is already taken";
+        } else if (existingUser.cid === cid) {
+          message = "CID is already registered";
+        } else if (existingUser.mobile === mobile) {
+          message = "Mobile number is already in use";
+        }
+        throw new Error(message);
+      }
+
+      const brokerId = generateBrokerId(username, mobile);
 
       const trimmedUser: User = {
-        username: form.get("username")?.toString().trim() || "",
+        username: username,
         password: await hashPassword(form.get("password")?.toString() || ""),
-        cid: form.get("cid")?.toString().trim() || "",
-        mobile: form.get("mobile")?.toString().trim() || "",
+        cid: cid,
+        mobile: mobile,
         gewog: form.get("gewog")?.toString().trim() || "",
         dzongkhag: form.get("dzongkhag")?.toString().trim() || "",
         brokerId: brokerId,
@@ -88,33 +107,6 @@ export async function POST(req: NextRequest) {
       { status: 201 },
     );
   } catch (error) {
-    if (error instanceof Prisma.PrismaClientKnownRequestError) {
-      if (error.code === "P2002") {
-        const target = error.meta?.target as string[];
-        if (target) {
-          const field = target[0];
-          let message = "";
-          switch (field) {
-            case "username":
-              message = "Username is already taken";
-              break;
-            case "cid":
-              message = "CID is already registered";
-              break;
-            case "mobile":
-              message = "Mobile number is already in use";
-              break;
-            case "brokerId":
-              message = "Broker ID is already assigned";
-              break;
-            default:
-              message = `${field} already exists`;
-          }
-          return NextResponse.json({ message }, { status: 409 });
-        }
-      }
-    }
-
     if (error instanceof Error) {
       return NextResponse.json({ message: error.message }, { status: 400 });
     }
