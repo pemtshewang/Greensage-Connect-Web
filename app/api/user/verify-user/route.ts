@@ -76,6 +76,7 @@ export async function PATCH(req: NextRequest) {
   }
 }
 
+// access token functionality
 function generateAccessToken(): string {
   return crypto.randomUUID();
 }
