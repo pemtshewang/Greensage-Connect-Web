@@ -67,8 +67,6 @@ model Reading {
   Pressure     Float?
   controller   Controller @relation(fields: [controllerId], references: [controllerId], onDelete: Cascade, onUpdate: Cascade)
   controllerId String
-  // User         User       @relation(fields: [brokerId], references: [brokerId], onDelete: Cascade, onUpdate: Cascade)
-  // brokerId     String
 }
 
 model WaterScheduleRecord {
@@ -86,7 +84,6 @@ model SoilMoistureThresholdRecord {
   value        Float
   controller   Controller @relation(fields: [controllerId], references: [controllerId], onDelete: Cascade, onUpdate: Cascade)
   controllerId String
-  // User         User       @relation(fields: [brokerId], references: [brokerId], onDelete: Cascade, onUpdate: Cascade) brokerId     String
 }
 
 model HumidityThresholdRecord {
@@ -139,7 +136,6 @@ model EnvironmentParameterThreshold {
   type         ThresholdType
 }
 
-//register token will be used by one of the users
 model RegistrantToken {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   token     String   @unique
