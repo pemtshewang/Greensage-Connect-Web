@@ -110,7 +110,7 @@ export async function PATCH(request: NextRequest) {
     const validRegToken = await db.registrantToken.findUnique({
       // @ts-ignore
       where: {
-        token: JSON.parse(tokenId),
+        token: tokenId,
       },
     });
     if (validRegToken.token != null) {
