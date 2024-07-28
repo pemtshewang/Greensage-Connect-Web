@@ -33,7 +33,7 @@ export async function POST(req: Request) {
   });
   const isPasswordCorrect = await checkPassword(
     password,
-    user?.password as string
+    user?.password as string,
   );
   if (user?.verifiedAt) {
     delete user["verifiedAt"];
@@ -52,12 +52,19 @@ export async function POST(req: Request) {
           status: 200,
         });
       }
+    } else {
+      return NextResponse.json(
+        { message: "Incorrect password or username" },
+        {
+          status: 400,
+        },
+      );
     }
   }
   return NextResponse.json(
-    { message: "Invalid username or password" },
+    { message: "User not verfied,verify first" },
     {
-      status: 401,
-    }
+      status: 400,
+    },
   );
 }

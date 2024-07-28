@@ -18,6 +18,7 @@ interface User {
   registrantId: string;
   posLat?: string;
   posLong?: string;
+  verifiedAt?: Date;
 }
 
 export async function POST(req: NextRequest) {
@@ -81,6 +82,7 @@ export async function POST(req: NextRequest) {
         brokerIp: env.EMQX_BASE_URL,
         brokerPort: Number(env.EMQX_PORT),
         registrantId: validRegistrantToken.token,
+        verifiedAt: new Date(),
       };
 
       const lat = form.get("lat")?.toString();
