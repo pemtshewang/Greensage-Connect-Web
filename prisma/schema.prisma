@@ -35,8 +35,8 @@ model User {
   brokerId        String          @unique
   brokerPort      Int
   brokerIp        String
-  registrant      RegistrantToken @relation(fields: [registrantId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  registrantId    String          @unique @db.ObjectId
+  registrant      RegistrantToken @relation(fields: [registrantId], references: [token], onDelete: Cascade, onUpdate: Cascade)
+  registrantId    String          @unique
 }
 
 enum Type {
