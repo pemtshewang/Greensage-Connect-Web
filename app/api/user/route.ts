@@ -123,7 +123,7 @@ export async function DELETE(req: Request) {
   const userIsAuthenticated = await getUser();
   const { id } = await req.json();
   if (userIsAuthenticated) {
-    const user = await db.user.delete({
+    const user = await db.user.deleteMany({
       where: {
         id,
       },

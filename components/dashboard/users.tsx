@@ -15,7 +15,7 @@ const getUsersJoinedCount = async () => {
       next: {
         revalidate: 5,
       },
-    }
+    },
   );
   const count = await res.json();
   return count;
@@ -29,7 +29,7 @@ const getUsersRecentJoinedList = async () => {
       next: {
         revalidate: 5,
       },
-    }
+    },
   );
   const list = await res.json();
   return list;
@@ -44,7 +44,7 @@ const getUsersOnlineCount = async () => {
       next: {
         revalidate: 5,
       },
-    }
+    },
   );
   const count = await res.json();
   return count;
@@ -175,9 +175,7 @@ export const RecentlyJoinedList = () => {
           <h3>Users Recently Joined</h3>
           <Icons.usersJoined />
         </span>
-        <p className="text-muted-foreground text-sm">
-          Scroll Down 
-        </p>
+        <p className="text-muted-foreground text-sm">Scroll Down</p>
       </div>
       <div className="p-3">
         <div className="flex-col justify-center space-y-2">

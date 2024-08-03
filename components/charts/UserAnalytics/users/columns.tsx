@@ -38,7 +38,6 @@ const deleteUserById = async (id: string) => {
     body: JSON.stringify({ id }),
   });
   const respObj = await res.json();
-  console.log(res.status);
   // fix this part
   if (res.ok) {
     toast.success("User deleted successfully");
