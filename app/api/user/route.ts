@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { hashPassword } from "@/utils/bcryptMgr";
 import { db } from "@/lib/db";
-import { generateBrokerId } from "./verify-user/emqx";
+import { createEMQXUser, generateBrokerId } from "./verify-user/emqx";
 import { env } from "@/env";
 import { getUser } from "@/lib/session";
 
@@ -91,6 +91,12 @@ export async function POST(req: NextRequest) {
         trimmedUser.posLat = lat;
         trimmedUser.posLong = long;
       }
+
+      await createEMQXUser({
+        user_id: trimmedUser.username,
+        password: trimmedUser.password,
+        is_superuser: false,
+      });
 
       const savedUser = await prisma.user.create({
         data: trimmedUser,
