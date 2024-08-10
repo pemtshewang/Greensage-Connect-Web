@@ -16,8 +16,11 @@ async function getData(): Promise<CropThreshold[]> {
       cache: "no-store",
     },
   );
-  const data = (await res.json()) ?? [];
-  return data;
+  if (res.ok) {
+    const data = (await res.json()) ?? [];
+    return data;
+  }
+  return [];
 }
 
 const SkeletonTable = () => (

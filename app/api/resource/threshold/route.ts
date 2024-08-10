@@ -9,7 +9,7 @@ export async function GET(req: Request) {
     const user = await getUser();
     const isAdmin = await db.admin.findUnique({
       where: {
-        username: user.name,
+        email: user.email
       },
     });
     if (isAdmin) {
