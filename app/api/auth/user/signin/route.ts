@@ -38,7 +38,7 @@ export async function POST(req: Request) {
     delete user["verifiedAt"];
 
     // create token while login to allow for authorization, should be replaced by jwt in future
-    const token = db.accessToken.create({
+    const token = await db.accessToken.create({
       data: {
         token: generateAccessToken(),
         userId: user.id,
