@@ -2,8 +2,10 @@ import { checkPassword } from "@/utils/bcryptMgr";
 import { db } from "@/lib/db";
 import { NextResponse } from "next/server";
 import { env } from "@/env";
+import { generateAccessToken, setExpirationDate } from "@/utils/tokengtr";
 
 export async function POST(req: Request) {
+
   const { username, password } = await req.json();
 
   const user = await db.user.findUnique({
@@ -26,23 +28,30 @@ export async function POST(req: Request) {
     },
   });
 
-  const accessToken = await db.accessToken.findUnique({
-    where: {
-      userId: user?.id,
-    },
-  });
   const isPasswordCorrect = await checkPassword(
     password,
     user?.password as string,
   );
+  // if user is only verified, then allow login
   if (user?.verifiedAt) {
+    // remove it from payload
     delete user["verifiedAt"];
+
+    // create token while login to allow for authorization, should be replaced by jwt in future
+    const token = db.accessToken.create({
+      data: {
+        token: generateAccessToken(),
+        userId: user.id,
+        expiresAt: setExpirationDate(),
+      },
+    });
+
     if (isPasswordCorrect) {
       if (user) {
         const modifiedUser = {
           ...user,
           brokerIp: env.EMQX_CONNECT_URL,
-          accessToken: accessToken,
+          accessToken: token,
         };
         const userAny = modifiedUser as any;
         const expirationDate = new Date();

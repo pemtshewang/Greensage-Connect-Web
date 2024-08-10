@@ -68,6 +68,7 @@ export async function POST(req: NextRequest) {
         }
         throw new Error(message);
       }
+      // if not error
 
       const brokerId = generateBrokerId(username, mobile);
 
