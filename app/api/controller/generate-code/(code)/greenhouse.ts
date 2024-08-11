@@ -80,7 +80,7 @@ export function generateGreenhouseCode(credentials: {
     /**
      * @brief URL or IP address of the MQTT broker.
      */
-    const char *mqtt_server = "${env.EMQX_CONNECT_URL}";
+    const char *mqtt_server = "${env.EMQX_BASE_URL}";
 
     /**
      * @brief Username for authenticating with the MQTT broker.
@@ -102,9 +102,7 @@ export function generateGreenhouseCode(credentials: {
      */
     static String controllerBrokerId = "${credentials.controllerBrokerId}";
 
-    /**
-     * @brief Broker ID for the user.
-     */
+    /** @brief Broker ID for the user. */
     static String userBrokerId = "${credentials.userBrokerId}";
 
     /**
@@ -204,6 +202,7 @@ CAUw7C29C79Fv1C5qfPrmAESrciIxpg0X40KPMbp1ZWVbd4=
      * @brief Flag indicating whether the exhaust fan is manually turned on or off.
      */
     bool isFanManuallyOn = false;
+    
     bool isLightManuallyOn = false;
 
     /**
@@ -380,13 +379,14 @@ CAUw7C29C79Fv1C5qfPrmAESrciIxpg0X40KPMbp1ZWVbd4=
       Serial.println("The topic is: ");
       Serial.println(topic);
       if (topic == "light") {
-        if(message=="on"){
-          isLightManuallyOn = true;
-          digitalWrite(lightPin,RELAY_ON);
-        }else{
-          isLightManuallyOn = false;
-          digitalWrite(lightPin,!RELAY_ON);
-        }
+      if(message=="on"){
+        isLightManuallyOn = true;
+        digitalWrite(lightPin,RELAY_ON);
+      }else{
+        isLightManuallyOn = false;
+        digitalWrite(lightPin,!RELAY_ON);
+      }
+        
       } else if (topic == "ventilationFan") {
         Serial.println("Ventilation fan is " + message);
         isFanManuallyOn = message == "on";
@@ -609,8 +609,8 @@ CAUw7C29C79Fv1C5qfPrmAESrciIxpg0X40KPMbp1ZWVbd4=
       pinMode(leftVentilationRollerShutterPinUp, OUTPUT);
       pinMode(leftVentilationRollerShutterPinDown, OUTPUT);
       pinMode(soilMoisturePin, INPUT);
-      pinMode(ldrPin,INPUT);
       pinMode(motorPin, OUTPUT);
+      pinMode(ldrPin,INPUT);
       digitalWrite(lightPin, !RELAY_ON);
       digitalWrite(exFanPin, !RELAY_ON);
       digitalWrite(waterValvePin, !RELAY_ON);
@@ -646,8 +646,6 @@ CAUw7C29C79Fv1C5qfPrmAESrciIxpg0X40KPMbp1ZWVbd4=
 
       if (!bme.begin()) {
         Serial.println("Could not find a valid BME680 sensor, check wiring!");
-        while (1)
-        ;
       }
 
       prefs.begin("my-app", false);
@@ -685,18 +683,21 @@ CAUw7C29C79Fv1C5qfPrmAESrciIxpg0X40KPMbp1ZWVbd4=
      */
     
     void printTime(DateTime now) {
-        display.setTextSize(1);
-        display.setTextColor(SSD1306_WHITE);
-        // Clear the line by printing spaces
-        display.setCursor(0, 40);
-        display.print("                                 ");
-        // Move the cursor back to the start of the line and print the updated time
-        display.setCursor(0, 40);
-        char timeStr[16];
-        sprintf(timeStr, "%02d:%02d", now.hour(), now.minute());
-        display.print("Time: ");
-        display.println(timeStr);
-        display.display();
+      display.setTextSize(1);
+      display.setTextColor(SSD1306_WHITE);
+
+      // Clear the specific area (x, y, width, height)
+      display.fillRect(0, 40, 128, 8, SSD1306_BLACK);
+
+      // Move the cursor back to the start of the line and print the updated time
+      display.setCursor(0, 40);
+      char timeStr[16];
+      sprintf(timeStr, "%02d:%02d", now.hour(), now.minute());
+      display.print("Time: ");
+      display.println(timeStr);
+
+      // Update the display
+      display.display();
     }
      
     static unsigned long lastTimeUpdate = 0;
@@ -712,11 +713,13 @@ CAUw7C29C79Fv1C5qfPrmAESrciIxpg0X40KPMbp1ZWVbd4=
       int ldrValue = digitalRead(ldrPin);
       
       if (ldrValue == 1) {
+        // off logic
         if(!isLightManuallyOn){
           digitalWrite(lightPin, RELAY_ON); 
         }
       } else {
-        digitalWrite(lightPin, !RELAY_ON); // Turn off the light
+        // on logic
+        digitalWrite(lightPin, !RELAY_ON); 
       }
       
       if (!mqtt_client.connected())
