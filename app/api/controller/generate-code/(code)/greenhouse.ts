@@ -80,7 +80,7 @@ export function generateGreenhouseCode(credentials: {
     /**
      * @brief URL or IP address of the MQTT broker.
      */
-    const char *mqtt_server = "${env.EMQX_BASE_URL}";
+    const char *mqtt_server = "${env.EMQX_CONNECT_URL}";
 
     /**
      * @brief Username for authenticating with the MQTT broker.
