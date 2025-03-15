@@ -28,7 +28,7 @@ const int motorPin = 26;  // Pin for controlling the motor (if applicable)
 // WiFi and MQTT credentials
 const char* ssid = "${credentials.wifiSSID}";
 const char* password = "${credentials.wifiPassword}";
-const char* mqtt_server = "meb1e91e.ala.asia-southeast1.emqxsl.com";
+const char* mqtt_server = "${env.EMQX_CONNECT_URL}";
 const char* mqtt_username = "${credentials.brokerUsername}";
 const char* mqtt_password = "${credentials.password}";
 const int mqtt_port = 8883;
