@@ -10,18 +10,21 @@ export async function POST(request: NextRequest) {
     const greenhouseControllers = await db.controller.findMany({
       where: {
         userId: userId,
-        type: 'Irrigation'
+        type: "Irrigation",
       },
       select: {
         controllerId: true,
-        name: true
-      }
-    })
+        name: true,
+      },
+    });
     return NextResponse.json(greenhouseControllers);
   }
-  return NextResponse.json({
-    message: "Unauthorized"
-  }, {
-    status: 401
-  })
+  return NextResponse.json(
+    {
+      message: "Unauthorized",
+    },
+    {
+      status: 401,
+    },
+  );
 }
