@@ -40,7 +40,7 @@ export function generateGreenhouseCode(credentials: {
 
     #include <Adafruit_GFX.h>
 
-    #include <Adafruit_SSD1306.h>
+    #include <Adafruit_SH110X.h>
 
     #include <WiFiClientSecure.h>
 
@@ -67,15 +67,16 @@ export function generateGreenhouseCode(credentials: {
     /**
      * @brief Logic level for turning on a relay (LOW in this case).
      */
-    #define RELAY_ON LOW
+    #define RELAY_ON HIGH
 
-    Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, & Wire, OLED_RESET);
     RTC_DS3231 rtc;
     WiFiClientSecure espClient;
     PubSubClient mqtt_client(espClient);
     WebSocketsServer webSocket = WebSocketsServer(80);
     Preferences prefs;
     Adafruit_BME680 bme;
+    // Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
+    Adafruit_SH1106G display = Adafruit_SH1106G(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
 
     /**
      * @brief URL or IP address of the MQTT broker.
@@ -381,16 +382,16 @@ CAUw7C29C79Fv1C5qfPrmAESrciIxpg0X40KPMbp1ZWVbd4=
       if (topic == "light") {
       if(message=="on"){
         isLightManuallyOn = true;
-        digitalWrite(lightPin,RELAY_ON);
+        digitalWrite(lightPin,!RELAY_ON);
       }else{
         isLightManuallyOn = false;
-        digitalWrite(lightPin,!RELAY_ON);
+        digitalWrite(lightPin,RELAY_ON);
       }
         
       } else if (topic == "ventilationFan") {
         Serial.println("Ventilation fan is " + message);
         isFanManuallyOn = message == "on";
-        digitalWrite(exFanPin, (message == "on") ? !RELAY_ON : RELAY_ON);
+        digitalWrite(exFanPin, (message == "on") ? RELAY_ON : !RELAY_ON);
       } else if (topic == "waterValve") {
         Serial.println("Water valve is " + message);
         isWaterValveManuallyOn = message == "open";
@@ -580,7 +581,7 @@ CAUw7C29C79Fv1C5qfPrmAESrciIxpg0X40KPMbp1ZWVbd4=
         if (mqtt_client.connect(clientId.c_str(), mqtt_username, mqtt_password.c_str())) {
           display.println();
           display.println("Connected to MQTT");
-          display.display();
+          // display.display("Connected to ");
           Serial.println("connected!");
           // subscribe to every topic
           // topic format: user/userBrokerId/topics
@@ -600,6 +601,18 @@ CAUw7C29C79Fv1C5qfPrmAESrciIxpg0X40KPMbp1ZWVbd4=
      * @brief Initial setup function.
      */
     void setup() {
+      Wire.begin();
+      if(!display.begin(SCREEN_ADDRESS,true)) {
+        Serial.println("SSD1306 allocation failed");
+        while (1)
+        ;
+      }else{
+        display.setTextSize(1);
+        display.setTextColor(SH110X_WHITE);
+      }
+      delay(2000); // Pause for 2 seconds
+      display.clearDisplay();
+
       Serial.begin(115200);
       pinMode(lightPin, OUTPUT);
       pinMode(exFanPin, OUTPUT);
@@ -611,33 +624,26 @@ CAUw7C29C79Fv1C5qfPrmAESrciIxpg0X40KPMbp1ZWVbd4=
       pinMode(soilMoisturePin, INPUT);
       pinMode(motorPin, OUTPUT);
       pinMode(ldrPin,INPUT);
-      digitalWrite(lightPin, !RELAY_ON);
-      digitalWrite(exFanPin, !RELAY_ON);
-      digitalWrite(waterValvePin, !RELAY_ON);
-      digitalWrite(rightVentilationRollerShutterPinUp, !RELAY_ON);
-      digitalWrite(rightVentilationRollerShutterPinDown, !RELAY_ON);
-      digitalWrite(leftVentilationRollerShutterPinUp, !RELAY_ON);
-      digitalWrite(leftVentilationRollerShutterPinDown, !RELAY_ON);
-      digitalWrite(motorPin, !RELAY_ON);
-
-      if (!display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS)) {
-        Serial.println(F("SSD1306 allocation failed"));
-        for (;;)
-        ;
-      }
-      display.display(); // Initialize with an empty display
-
-      delay(2000); // Pause for 2 seconds
-      display.clearDisplay();
+      digitalWrite(lightPin, RELAY_ON);
+      digitalWrite(exFanPin, RELAY_ON);
+      digitalWrite(waterValvePin, RELAY_ON);
+      digitalWrite(rightVentilationRollerShutterPinUp, RELAY_ON);
+      digitalWrite(rightVentilationRollerShutterPinDown, RELAY_ON);
+      digitalWrite(leftVentilationRollerShutterPinUp, RELAY_ON);
+      digitalWrite(leftVentilationRollerShutterPinDown, RELAY_ON);
+      digitalWrite(motorPin, RELAY_ON);
 
       if (!rtc.begin()) {
         Serial.println("Could not find RTC! Check circuit.");
         while (1)
         ;
       }
-      // first time initialize to get time
+      // uncomment and upload for second time
       rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
-      
+      Wire.beginTransmission(0x68); // address DS3231
+      Wire.write(0x0E); // select register
+      Wire.write(0b00011100); // write register bitmap, bit 7 is /EOSC
+      Wire.endTransmission();
       if (rtc.lostPower()) {
         Serial.println("RTC lost power, lets set the time!");
         // following line sets the RTC to the date & time this sketch was compiled
@@ -661,8 +667,6 @@ CAUw7C29C79Fv1C5qfPrmAESrciIxpg0X40KPMbp1ZWVbd4=
         Serial.println("Connecting to wifi.....");
         delay(1000);
       }
-      display.setTextSize(1);
-      display.setTextColor(SSD1306_WHITE);
       display.println(F("localIP:"));
       display.print(WiFi.localIP());
       display.display();
@@ -684,10 +688,10 @@ CAUw7C29C79Fv1C5qfPrmAESrciIxpg0X40KPMbp1ZWVbd4=
     
     void printTime(DateTime now) {
       display.setTextSize(1);
-      display.setTextColor(SSD1306_WHITE);
+      display.setTextColor(SH110X_WHITE);
 
       // Clear the specific area (x, y, width, height)
-      display.fillRect(0, 40, 128, 8, SSD1306_BLACK);
+      display.fillRect(0, 40, 128, 8, SH110X_WHITE);
 
       // Move the cursor back to the start of the line and print the updated time
       display.setCursor(0, 40);
@@ -749,7 +753,6 @@ CAUw7C29C79Fv1C5qfPrmAESrciIxpg0X40KPMbp1ZWVbd4=
       Serial.println(humidity);
 
       if (temperature > tempThreshold && !isnan(temperature)) {
-        Serial.println("Temperature is greater than threshold");
         digitalWrite(exFanPin, RELAY_ON);
         digitalWrite(rightVentilationRollerShutterPinUp, RELAY_ON);
         digitalWrite(leftVentilationRollerShutterPinUp, RELAY_ON);
@@ -758,7 +761,6 @@ CAUw7C29C79Fv1C5qfPrmAESrciIxpg0X40KPMbp1ZWVbd4=
       }
 
       if (humidity > humThreshold && !isnan(humidity)) {
-        Serial.println("Humidity is greater than threshold");
         digitalWrite(exFanPin, RELAY_ON);
         digitalWrite(rightVentilationRollerShutterPinUp, RELAY_ON);
         digitalWrite(leftVentilationRollerShutterPinUp, RELAY_ON);
@@ -808,7 +810,7 @@ CAUw7C29C79Fv1C5qfPrmAESrciIxpg0X40KPMbp1ZWVbd4=
         } else {
           Serial.println("Failed to read from BME sensor!");
         }
-    }
-  } 
+      }
+  }
   `;
 }
