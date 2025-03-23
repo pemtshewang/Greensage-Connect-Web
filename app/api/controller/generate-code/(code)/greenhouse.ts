@@ -21,8 +21,7 @@ export function generateGreenhouseCode(credentials: {
      * @author Pem Tshewang
      * @date 7 march  2024
 **/
-
-    #include <WiFi.h>
+#include <WiFi.h>
 
     #include <WebSocketsServer.h>
 
@@ -67,7 +66,7 @@ export function generateGreenhouseCode(credentials: {
     /**
      * @brief Logic level for turning on a relay (LOW in this case).
      */
-    #define RELAY_ON HIGH
+    #define RELAY_ON LOW
 
     RTC_DS3231 rtc;
     WiFiClientSecure espClient;
@@ -382,10 +381,10 @@ CAUw7C29C79Fv1C5qfPrmAESrciIxpg0X40KPMbp1ZWVbd4=
       if (topic == "light") {
       if(message=="on"){
         isLightManuallyOn = true;
-        digitalWrite(lightPin,!RELAY_ON);
+        digitalWrite(lightPin,RELAY_ON);
       }else{
         isLightManuallyOn = false;
-        digitalWrite(lightPin,RELAY_ON);
+        digitalWrite(lightPin,!RELAY_ON);
       }
         
       } else if (topic == "ventilationFan") {
@@ -624,14 +623,14 @@ CAUw7C29C79Fv1C5qfPrmAESrciIxpg0X40KPMbp1ZWVbd4=
       pinMode(soilMoisturePin, INPUT);
       pinMode(motorPin, OUTPUT);
       pinMode(ldrPin,INPUT);
-      digitalWrite(lightPin, RELAY_ON);
-      digitalWrite(exFanPin, RELAY_ON);
-      digitalWrite(waterValvePin, RELAY_ON);
-      digitalWrite(rightVentilationRollerShutterPinUp, RELAY_ON);
-      digitalWrite(rightVentilationRollerShutterPinDown, RELAY_ON);
-      digitalWrite(leftVentilationRollerShutterPinUp, RELAY_ON);
-      digitalWrite(leftVentilationRollerShutterPinDown, RELAY_ON);
-      digitalWrite(motorPin, RELAY_ON);
+      digitalWrite(lightPin, !RELAY_ON);
+      digitalWrite(exFanPin, !RELAY_ON);
+      digitalWrite(waterValvePin, !RELAY_ON);
+      digitalWrite(rightVentilationRollerShutterPinUp, !RELAY_ON);
+      digitalWrite(rightVentilationRollerShutterPinDown, !RELAY_ON);
+      digitalWrite(leftVentilationRollerShutterPinUp, !RELAY_ON);
+      digitalWrite(leftVentilationRollerShutterPinDown, !RELAY_ON);
+      digitalWrite(motorPin, !RELAY_ON);
 
       if (!rtc.begin()) {
         Serial.println("Could not find RTC! Check circuit.");
@@ -697,11 +696,13 @@ CAUw7C29C79Fv1C5qfPrmAESrciIxpg0X40KPMbp1ZWVbd4=
       display.setCursor(0, 40);
       char timeStr[16];
       sprintf(timeStr, "%02d:%02d", now.hour(), now.minute());
-      display.print("Time: ");
+      /*display.print("Time: ");
       display.println(timeStr);
 
       // Update the display
-      display.display();
+      display.display();*/
+      Serial.println("CurrentTime:"+String(timeStr));
+      delay(1000);
     }
      
     static unsigned long lastTimeUpdate = 0;
@@ -709,14 +710,14 @@ CAUw7C29C79Fv1C5qfPrmAESrciIxpg0X40KPMbp1ZWVbd4=
     void loop() {
       // printing the time on rtc
       DateTime now = rtc.now();
+      printTime(now);
       if (millis() - lastTimeUpdate >= timeUpdateInterval) {
         lastTimeUpdate = millis();
-        printTime(now);
       }
       
       int ldrValue = digitalRead(ldrPin);
       
-      if (ldrValue == 1) {
+      /*if (ldrValue == 1) {
         // off logic
         if(!isLightManuallyOn){
           digitalWrite(lightPin, RELAY_ON); 
@@ -724,7 +725,7 @@ CAUw7C29C79Fv1C5qfPrmAESrciIxpg0X40KPMbp1ZWVbd4=
       } else {
         // on logic
         digitalWrite(lightPin, !RELAY_ON); 
-      }
+      }*/
       
       if (!mqtt_client.connected())
         reconnect();
@@ -811,6 +812,6 @@ CAUw7C29C79Fv1C5qfPrmAESrciIxpg0X40KPMbp1ZWVbd4=
           Serial.println("Failed to read from BME sensor!");
         }
       }
-  }
+    }
   `;
 }
