@@ -21,7 +21,7 @@ export function generateIrrigationCode(credentials: {
 
 #define RELAY_ON LOW
 #define SOILMOISTURE_PIN 36  // Pin for soil moisture sensor Define pins for water valves
-const int waterValvePins[] = {2, 4, 5, 12, 13, 14, 27};
+const int waterValvePins[] = { 4, 5, 12, 13, 14, 19, 27};
 const int numValves = sizeof(waterValvePins) / sizeof(int);
 const int motorPin = 26;  // Pin for controlling the motor (if applicable)
 
@@ -77,10 +77,10 @@ const int wetValue = 1500;   // Value for wet soil
 // Structure to store schedule information
 struct Schedule {
   bool isActive;
-  uint8_t startHour;
-  uint8_t startMinute;
-  uint8_t endHour;
-  uint8_t endMinute;
+  String startHour;
+  String startMinute;
+  String endHour;
+  String endMinute;
   uint8_t repetitionDays;
 };
 
@@ -93,30 +93,33 @@ void saveScheduleToPrefs(int valveNum) {
                         String(valveSchedules[valveNum].endHour) + ":" + String(valveSchedules[valveNum].endMinute) + "|" +
                         String(valveSchedules[valveNum].repetitionDays);
   prefs.putString(scheduleKey.c_str(), scheduleData);
-  Serial.print("Saved schedule for valve ");
-  Serial.print(valveNum);
-  Serial.print(": ");
+  Serial.print("Saved schedule for valve "); Serial.print(valveNum);
+  Serial.print(":");
   Serial.println(scheduleData);
 }
 
 void scheduleValve(int valveNum, String startTime, String endTime, uint8_t repetitionDays) {
+  Serial.println("Recieved time for scheduling "+startTime+"---"+endTime);
   valveSchedules[valveNum].isActive = true;
   
   // Parse start time
   int colonPos = startTime.indexOf(':');
   if (colonPos > 0) {
-    valveSchedules[valveNum].startHour = startTime.substring(0, colonPos).toInt();
-    valveSchedules[valveNum].startMinute = startTime.substring(colonPos + 1).toInt();
+    valveSchedules[valveNum].startHour = startTime.substring(0, colonPos);
+    valveSchedules[valveNum].startMinute = startTime.substring(colonPos+1);
+    Serial.println("Stored timing for the start hour --->"+valveSchedules[valveNum].startHour+":"+valveSchedules[valveNum].startMinute);
+    valveSchedules[valveNum].startMinute = startTime.substring(colonPos + 1);
   }
   
   // Parse end time
   colonPos = endTime.indexOf(':');
   if (colonPos > 0) {
-    valveSchedules[valveNum].endHour = endTime.substring(0, colonPos).toInt();
-    valveSchedules[valveNum].endMinute = endTime.substring(colonPos + 1).toInt();
+    valveSchedules[valveNum].endHour = endTime.substring(0, colonPos);
+    valveSchedules[valveNum].endMinute = endTime.substring(colonPos + 1);
   }
   
   valveSchedules[valveNum].repetitionDays = repetitionDays;
+  Serial.println("Scheduled for: "+valveSchedules[valveNum].startHour);
   
   // Save the schedule to preferences
   saveScheduleToPrefs(valveNum);
@@ -131,65 +134,45 @@ void scheduleValve(int valveNum, String startTime, String endTime, uint8_t repet
   Serial.print(valveSchedules[valveNum].endHour);
   Serial.print(":");
   Serial.print(valveSchedules[valveNum].endMinute);
-  Serial.print(" on days mask: ");
-  Serial.println(valveSchedules[valveNum].repetitionDays, BIN);
 }
 
 // Check if the current time is within a schedule's time range
-bool isTimeInRange(uint8_t currentHour, uint8_t currentMin, uint8_t startHour, uint8_t startMin, uint8_t endHour, uint8_t endMin) {
-  // Convert to minutes for easier comparison
-  int currentTimeInMinutes = currentHour * 60 + currentMin;
-  int startTimeInMinutes = startHour * 60 + startMin;
-  int endTimeInMinutes = endHour * 60 + endMin;
-  
-  // Handle case where end time is on the next day
-  if (endTimeInMinutes < startTimeInMinutes) {
-    return (currentTimeInMinutes >= startTimeInMinutes) || (currentTimeInMinutes <= endTimeInMinutes);
-  }
-  
-  // Normal case: start time and end time on the same day
-  return (currentTimeInMinutes >= startTimeInMinutes) && (currentTimeInMinutes <= endTimeInMinutes);
-}
-
 void checkScheduledIrrigations() {
   DateTime now = rtc.now();
-  uint8_t currentHour = now.hour();
-  uint8_t currentMinute = now.minute();
-  uint8_t currentDay = now.dayOfTheWeek();
-  
-  // Convert from RTC's 0-6 (Sunday is 0) to our 1-7 (Monday is 1) day format
-  if (currentDay == 0) currentDay = 7;  // Convert Sunday from 0 to 7
+
+  int currentDay = now.dayOfTheWeek();
+  if(currentDay == 0) currentDay = 7;
+
   
   uint8_t dayMask = (1 << (currentDay - 1));  // Create bitmask for current day
   
-  // Log current time and day for debugging
-  Serial.print("Current time: ");
-  Serial.print(currentHour);
-  Serial.print(":");
-  Serial.print(currentMinute);
-  Serial.print(" Day of week: ");
-  Serial.print(currentDay);
-  Serial.print(" Day mask: ");
-  Serial.println(dayMask, BIN);
-  
+  //check  the time 
+  char currentTimeStr[9]; 
+  sprintf(currentTimeStr, "%02d:%02d", now.hour(), now.minute());
   for (int i = 0; i < numValves; i++) {
+    
     if (valveSchedules[i].isActive) {
+      Serial.println("isActive");
       // Check if today is a scheduled day for this valve
-      if ((valveSchedules[i].repetitionDays & dayMask) > 0) {
-        Serial.print("Valve ");
-        Serial.print(i);
-        Serial.println(" is scheduled for today");
-        
-        bool shouldBeOn = isTimeInRange(
-          currentHour, currentMinute,
-          valveSchedules[i].startHour, valveSchedules[i].startMinute,
-          valveSchedules[i].endHour, valveSchedules[i].endMinute
-        );
-        if (shouldBeOn) {
-          Serial.print("Activating valve ");
-          Serial.println(i);
-          digitalWrite(motorPin, RELAY_ON);
-          digitalWrite(waterValvePins[i], RELAY_ON);
+
+      Serial.println(valveSchedules[i].repetitionDays);
+      bool isScheduled = valveSchedules[i].repetitionDays & dayMask;
+      Serial.println(isScheduled);
+      if (!isScheduled) {
+          Serial.println("isScheduled for now");
+          String startTime = valveSchedules[i].startHour+":"+valveSchedules[i].startMinute;
+          String endTime = valveSchedules[i].endHour+":"+valveSchedules[i].endMinute;
+          Serial.println("--------s start time"+startTime+ "e current ---------"+currentTimeStr );
+          if(startTime == currentTimeStr){
+            Serial.println("The starttime matches as scheduled");
+            digitalWrite(waterValvePins[i], RELAY_ON);
+            digitalWrite(motorPin, RELAY_ON);
+          }
+          if(endTime == currentTimeStr){
+            Serial.println("The endtime matches as scheduled");
+            digitalWrite(waterValvePins[i], !RELAY_ON);
+            digitalWrite(motorPin, !RELAY_ON);
+          }
         } else {
           digitalWrite(waterValvePins[i], !RELAY_ON);
           // Only turn off motor if all valves are off
@@ -203,12 +186,11 @@ void checkScheduledIrrigations() {
           if (!anyValveOn) {
             digitalWrite(motorPin, !RELAY_ON);
           }
-        }
+        } 
       }
-    }
-  }
+      
+  } 
 }
-
 void handleMqttMessage(char* topic, byte* payload, unsigned int length) {
   String receivedTopic = String(topic);
   String receivedPayload;
@@ -253,26 +235,21 @@ void handleMqttMessage(char* topic, byte* payload, unsigned int length) {
 
   // Handle scheduling messages
   else if (receivedTopic.startsWith("user/" + userBrokerId + "/" + controllerBrokerId + "/schedule")) {
-    int valveIndex = receivedTopic.substring(receivedTopic.lastIndexOf("/") + 1).toInt();
+    int valveIndex = receivedPayload.substring(0,1).toInt();
+
+    valveIndex=valveIndex-1;
+
     if (valveIndex >= 0 && valveIndex < numValves) {
       // Parse the payload format: startTime|endTime|repetitionDays
+
       int firstDelimiter = receivedPayload.indexOf('|');
-      int lastDelimiter = receivedPayload.lastIndexOf('|');
+      int secondDelimiter = receivedPayload.indexOf('|',firstDelimiter+1);
+      int lastDelimiter = receivedPayload.lastIndexOf("|");
       
       if (firstDelimiter > 0 && lastDelimiter > firstDelimiter) {
-        String startTime = receivedPayload.substring(0, firstDelimiter);
-        String endTime = receivedPayload.substring(firstDelimiter + 1, lastDelimiter);
+        String startTime = receivedPayload.substring(firstDelimiter+1, secondDelimiter);
+        String endTime = receivedPayload.substring(secondDelimiter + 1, lastDelimiter);
         String repetitionDaysStr = receivedPayload.substring(lastDelimiter + 1);
-        
-        // Convert repetition days string to bitmask
-        uint8_t repetitionDayMask = 0;
-        for (int i = 0; i < repetitionDaysStr.length(); i++) {
-          char dayChar = repetitionDaysStr.charAt(i);
-          if (dayChar >= '1' && dayChar <= '7') {
-            int dayIndex = dayChar - '1';  // Convert '1' to 0, '2' to 1, etc.
-            repetitionDayMask |= (1 << dayIndex);
-          }
-        }
         
         Serial.print("Scheduling valve ");
         Serial.print(valveIndex);
@@ -280,10 +257,8 @@ void handleMqttMessage(char* topic, byte* payload, unsigned int length) {
         Serial.print(startTime);
         Serial.print(" to ");
         Serial.print(endTime);
-        Serial.print(" on days mask: ");
-        Serial.println(repetitionDayMask, BIN);
         
-        scheduleValve(valveIndex, startTime, endTime, repetitionDayMask);
+        scheduleValve(valveIndex, startTime, endTime, repetitionDaysStr.toInt());
       }
     } else {
       Serial.println("Invalid valve index");
@@ -373,7 +348,7 @@ void setup() {
   digitalWrite(motorPin, !RELAY_ON);
   
   // Setup WiFi
-  WiFi.mode(WIFI_STA);
+  WiFi.mode(WIFI_AP_STA);
   WiFi.begin(ssid, password);
   
   // Wait for WiFi connection
@@ -402,13 +377,20 @@ void setup() {
   mqtt_client.setServer(mqtt_server, mqtt_port);
   mqtt_client.setCallback(handleMqttMessage);
   
-  // Setup RTC
+  //Setup RTC
   if (!rtc.begin()) {
     Serial.println("Could not find RTC!");
   } else {
     Serial.println("RTC found");
     // Uncomment this line to set the RTC to the date & time this sketch was compiled
-    rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
+    // rtc adjustment required for first time flash
+    // uncomment and upload for second time
+    // rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
+    // Wire.beginTransmission(0x68); // address DS3231
+    // Wire.write(0x0E); // select register
+    // Wire.write(0b00i011100); // write register bitmap, bit 7 is /EOSC
+    // Wire.endTransmission();
+
     DateTime now = rtc.now();
     Serial.print("Current RTC time: ");
     Serial.print(now.year(), DEC);
@@ -438,6 +420,9 @@ void setup() {
   webSocket.onEvent(onWebSocketEvent);
   
   Serial.println("Setup complete");
+  DateTime now = rtc.now();
+  Serial.println(now.hour()+":"+now.minute());
+
 }
 
 void loop() {
@@ -501,15 +486,15 @@ void loadSchedulesFromPrefs() {
         // Parse start time
         int colonPos = startTimeStr.indexOf(':');
         if (colonPos > 0) {
-          valveSchedules[i].startHour = startTimeStr.substring(0, colonPos).toInt();
-          valveSchedules[i].startMinute = startTimeStr.substring(colonPos + 1).toInt();
+          valveSchedules[i].startHour = startTimeStr.substring(0, colonPos);
+          valveSchedules[i].startMinute = startTimeStr.substring(colonPos + 1);
         }
         
         // Parse end time
         colonPos = endTimeStr.indexOf(':');
         if (colonPos > 0) {
-          valveSchedules[i].endHour = endTimeStr.substring(0, colonPos).toInt();
-          valveSchedules[i].endMinute = endTimeStr.substring(colonPos + 1).toInt();
+          valveSchedules[i].endHour = endTimeStr.substring(0, colonPos);
+          valveSchedules[i].endMinute = endTimeStr.substring(colonPos + 1);
         }
         
         // Parse repetition days
