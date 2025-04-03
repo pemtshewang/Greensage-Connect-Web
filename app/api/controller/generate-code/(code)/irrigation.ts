@@ -158,7 +158,7 @@ void checkScheduledIrrigations() {
       Serial.println(valveSchedules[i].repetitionDays);
       bool isScheduled = valveSchedules[i].repetitionDays & dayMask;
       Serial.println(isScheduled);
-      if (!isScheduled) {
+      if (isScheduled) {
           Serial.println("isScheduled for now");
           String startTime = valveSchedules[i].startHour+":"+valveSchedules[i].startMinute;
           String endTime = valveSchedules[i].endHour+":"+valveSchedules[i].endMinute;
