@@ -158,7 +158,7 @@ void checkScheduledIrrigations() {
       Serial.println(valveSchedules[i].repetitionDays);
       bool isScheduled = valveSchedules[i].repetitionDays & dayMask;
       Serial.println(isScheduled);
-      if (isScheduled) {
+      if (!isScheduled) {
           Serial.println("isScheduled for now");
           String startTime = valveSchedules[i].startHour+":"+valveSchedules[i].startMinute;
           String endTime = valveSchedules[i].endHour+":"+valveSchedules[i].endMinute;
@@ -388,7 +388,7 @@ void setup() {
     // rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
     // Wire.beginTransmission(0x68); // address DS3231
     // Wire.write(0x0E); // select register
-    // Wire.write(0b00i011100); // write register bitmap, bit 7 is /EOSC
+    // Wire.write(0b001011100); // write register bitmap, bit 7 is /EOSC
     // Wire.endTransmission();
 
     DateTime now = rtc.now();
